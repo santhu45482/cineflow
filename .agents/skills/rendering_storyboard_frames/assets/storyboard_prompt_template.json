@@ -1,0 +1,28 @@
+{
+  "shot_id": "shot-001",
+  "camera": {
+    "shot_type": "MCU",
+    "lens": "35mm anamorphic",
+    "focal_ratio": "f/2.0",
+    "movement": "Slow push-in"
+  },
+  "subject": {
+    "character_id": "char_kade",
+    "expression": "Focused, wary",
+    "pose": "Standing under dripping awning"
+  },
+  "environment": {
+    "location": "Sector 4 Alleyway",
+    "weather": "Heavy rain, wet reflective pavement",
+    "time_of_day": "Night"
+  },
+  "lighting": {
+    "key": "Cyan neon spill from above",
+    "rim": "Warm amber backlight",
+    "atmosphere": "Volumetric mist"
+  },
+  "render_settings": {
+    "aspect_ratio": "16:9",
+    "quality": "cinematic photoreal"
+  }
+}

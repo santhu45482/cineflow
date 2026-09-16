@@ -1,0 +1,65 @@
+[
+  {
+    "case_id": "dialogue_synth_stem_001",
+    "description": "Positive Trigger: Synthesizing character dialogue stem with SSML prosody and 48kHz audio.",
+    "input": "Synthesize dialogue for shot-01-02: Kade Mercer speaking 'The city never forgets.' with weary intensity using Detective_Male_Gruff.",
+    "expected_skill": "directing-character-dialogue",
+    "trajectory_mode": "IN_ORDER",
+    "expected_tool_calls": [
+      {
+        "tool": "synthesize_dialogue",
+        "args": {
+          "shot_id": "shot-01-02",
+          "character_id": "char_kade",
+          "voice_preset": "Detective_Male_Gruff",
+          "emotion": "weary_intensity"
+        }
+      }
+    ],
+    "expected_output_format": "dialogue_stem_manifest",
+    "rubric": [
+      "Calls synthesize_dialogue with character_id char_kade and Detective_Male_Gruff",
+      "Shapes weary emotional inflection",
+      "Targets 48kHz studio sample rate"
+    ]
+  },
+  {
+    "case_id": "dialogue_live_table_read_002",
+    "description": "Positive Trigger: Initiating interactive real-time Gemini Live API table read rehearsal.",
+    "input": "Start a live table read rehearsal session with the Director for Kade Mercer in Scene 3.",
+    "expected_skill": "directing-character-dialogue",
+    "trajectory_mode": "IN_ORDER",
+    "expected_tool_calls": [
+      {
+        "tool": "start_script_rehearsal_session",
+        "args": {
+          "character_role": "Kade Mercer"
+        }
+      }
+    ],
+    "expected_output_format": "live_session_connection_info",
+    "rubric": [
+      "Invokes start_script_rehearsal_session for Kade Mercer",
+      "Sets up low-latency bidirectional WebSocket connection parameters",
+      "Loads character persona and scene dramatic context"
+    ]
+  },
+  {
+    "case_id": "dialogue_negative_score_003",
+    "description": "Negative Trigger: Score composition request must NOT trigger dialogue direction.",
+    "input": "Compose 45-second atmospheric dark synthesizer pad for the intro scene.",
+    "expected_skill": "composing-cinematic-scores",
+    "trajectory_mode": "ANY_ORDER",
+    "expected_tool_calls": [
+      {
+        "tool": "compose_scene_score",
+        "args": {}
+      }
+    ],
+    "expected_output_format": "score_stem_asset",
+    "rubric": [
+      "Skill 'directing-character-dialogue' remains un-triggered",
+      "Routes cleanly to score composition agent"
+    ]
+  }
+]

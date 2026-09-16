@@ -1,0 +1,63 @@
+[
+  {
+    "case_id": "qa_audit_pass_001",
+    "description": "Positive Trigger: Auditing rendered storyboard frame against visual prompt for compliance.",
+    "input": "Audit rendered frame gs://cineflow-renders/shot-01-01.png against screenplay prompt for rain slicked alleyway.",
+    "expected_skill": "auditing-visual-continuity",
+    "trajectory_mode": "ANY_ORDER",
+    "expected_tool_calls": [
+      {
+        "tool": "inspect_and_verify_shot",
+        "args": {
+          "shot_id": "shot-01-01",
+          "image_uri": "gs://cineflow-renders/shot-01-01.png"
+        }
+      }
+    ],
+    "expected_output_format": "qa_audit_report",
+    "rubric": [
+      "Invokes inspect_and_verify_shot with shot_id and image_uri",
+      "Evaluates visual prompt alignment and anatomical consistency",
+      "Produces numerical compliance score"
+    ]
+  },
+  {
+    "case_id": "qa_audit_defect_retry_002",
+    "description": "Positive Trigger: Detecting character appearance defect and recommending retry render.",
+    "input": "Inspect shot-02-01: Character coat rendered as red jacket instead of charcoal trenchcoat. Flag defect.",
+    "expected_skill": "auditing-visual-continuity",
+    "trajectory_mode": "ANY_ORDER",
+    "expected_tool_calls": [
+      {
+        "tool": "inspect_and_verify_shot",
+        "args": {
+          "shot_id": "shot-02-01"
+        }
+      }
+    ],
+    "expected_output_format": "qa_audit_report",
+    "rubric": [
+      "Identifies costume color mismatch against character bible",
+      "Assigns SEVERITY_HIGH defect classification",
+      "Sets qa_passed to False and triggers RETRY_RENDER recommendation"
+    ]
+  },
+  {
+    "case_id": "qa_negative_gate_003",
+    "description": "Negative Trigger: Director milestone gate approval must NOT trigger QA critic audit.",
+    "input": "Approve Gate 2 for session prod-774 and proceed to final rough-cut assembly.",
+    "expected_skill": "orchestrating-production-lifecycle",
+    "trajectory_mode": "EXACT",
+    "expected_tool_calls": [
+      {
+        "tool": "resume_production_workflow",
+        "args": {}
+      }
+    ],
+    "expected_output_format": "gate_advancement_confirmation",
+    "rubric": [
+      "Skill 'auditing-visual-continuity' remains un-triggered",
+      "Routes cleanly to Showrunner Orchestrator"
+    ]
+  }
+]

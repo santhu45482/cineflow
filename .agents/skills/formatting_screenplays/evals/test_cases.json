@@ -1,0 +1,60 @@
+[
+  {
+    "case_id": "screenplay_ingest_001",
+    "description": "Positive Trigger: Parsing raw Fountain screenplay file into structured scene entities.",
+    "input": "Ingest Scene 1 Fountain script: EXT. CYBER ALLEY - NIGHT. Rain slicks neon pavement. Kade Mercer watches.",
+    "expected_skill": "formatting-screenplays",
+    "trajectory_mode": "IN_ORDER",
+    "expected_tool_calls": [
+      {
+        "tool": "ingest_screenplay_document",
+        "args": {
+          "scene_number": 1
+        }
+      }
+    ],
+    "expected_output_format": "fountain_ingest_summary",
+    "rubric": [
+      "Calls ingest_screenplay_document for scene 1",
+      "Extracts slugline, action block, and character mentions",
+      "Validates Fountain formatting syntax"
+    ]
+  },
+  {
+    "case_id": "screenplay_pacing_002",
+    "description": "Positive Trigger: Analyzing emotional valence and tension pacing across scene beats.",
+    "input": "Analyze dramatic pacing and sentiment curve for the Scene 4 interrogation sequence.",
+    "expected_skill": "formatting-screenplays",
+    "trajectory_mode": "IN_ORDER",
+    "expected_tool_calls": [
+      {
+        "tool": "analyze_script_pacing_and_sentiment",
+        "args": {}
+      }
+    ],
+    "expected_output_format": "pacing_analysis_report",
+    "rubric": [
+      "Invokes analyze_script_pacing_and_sentiment",
+      "Provides emotional valence score and tension progression",
+      "Recommends dynamic shot duration pacing"
+    ]
+  },
+  {
+    "case_id": "screenplay_negative_render_003",
+    "description": "Negative Trigger: Image rendering request must NOT trigger screenplay formatting.",
+    "input": "Render a storyboard frame of Kade Mercer in 2.39:1 aspect ratio with neon volumetric lighting.",
+    "expected_skill": "rendering-storyboard-frames",
+    "trajectory_mode": "IN_ORDER",
+    "expected_tool_calls": [
+      {
+        "tool": "render_storyboard_frame",
+        "args": {}
+      }
+    ],
+    "expected_output_format": "storyboard_asset",
+    "rubric": [
+      "Skill 'formatting-screenplays' remains un-triggered",
+      "Routes cleanly to storyboard rendering agent"
+    ]
+  }
+]

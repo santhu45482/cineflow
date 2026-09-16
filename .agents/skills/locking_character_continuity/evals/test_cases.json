@@ -1,0 +1,62 @@
+[
+  {
+    "case_id": "casting_register_001",
+    "description": "Positive Trigger: Registering character visual anchor, deterministic seed, and voice preset.",
+    "input": "Register character Kade Mercer in the production bible: seed 849201, visual anchor '40yo detective in charcoal coat with blue cybernetic eye', voice preset Detective_Male_Gruff.",
+    "expected_skill": "locking-character-continuity",
+    "trajectory_mode": "EXACT",
+    "expected_tool_calls": [
+      {
+        "tool": "register_character_bible",
+        "args": {
+          "character_id": "char_kade",
+          "name": "Kade Mercer",
+          "seed_token": 849201,
+          "voice_preset": "Detective_Male_Gruff"
+        }
+      }
+    ],
+    "expected_output_format": "character_bible_entry",
+    "rubric": [
+      "Invokes register_character_bible with exact parameters",
+      "Locks deterministic seed 849201",
+      "Binds Detective_Male_Gruff acoustic profile"
+    ]
+  },
+  {
+    "case_id": "casting_get_bible_002",
+    "description": "Positive Trigger: Inspecting character roster and visual continuity seeds.",
+    "input": "Check the character bible for active production session to confirm locked seeds.",
+    "expected_skill": "locking-character-continuity",
+    "trajectory_mode": "ANY_ORDER",
+    "expected_tool_calls": [
+      {
+        "tool": "get_character_bible",
+        "args": {}
+      }
+    ],
+    "expected_output_format": "character_roster_overview",
+    "rubric": [
+      "Retrieves registered character roster via get_character_bible",
+      "Verifies seed consistency across characters"
+    ]
+  },
+  {
+    "case_id": "casting_negative_dialogue_003",
+    "description": "Negative Trigger: Speech synthesis request must NOT trigger casting continuity.",
+    "input": "Synthesize audio WAV stem for Kade's dialogue line with weary inflection at 48kHz.",
+    "expected_skill": "directing-character-dialogue",
+    "trajectory_mode": "IN_ORDER",
+    "expected_tool_calls": [
+      {
+        "tool": "synthesize_dialogue",
+        "args": {}
+      }
+    ],
+    "expected_output_format": "dialogue_audio_stem",
+    "rubric": [
+      "Skill 'locking-character-continuity' remains un-triggered",
+      "Routes cleanly to audio direction agent"
+    ]
+  }
+]

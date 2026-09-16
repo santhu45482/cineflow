@@ -1,0 +1,134 @@
+# ==============================================================================
+# Byte-compiled / optimized / DLL files
+# ==============================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# SQLite and Local Databases
+*.db
+*.sqlite
+*.sqlite3
+.adk/
+app/.adk/
+
+
+# ==============================================================================
+# Distribution / packaging / virtual environments
+# ==============================================================================
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Environments
+.env
+.env.local
+.env.*.local
+!.env.example
+.venv/
+.venv*/
+env/
+venv/
+ENV/
+
+# ==============================================================================
+# Testing, coverage, and caches
+# ==============================================================================
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Generated eval run traces & temporary grade dumps (preserve datasets & code)
+tests/eval/traces/**/*.json
+tests/eval/traces/*.json
+tests/eval/results/**/*.json
+tests/eval/results/*.json
+tests/eval/results/*.html
+artifacts/traces/
+artifacts/grade_results/
+!tests/eval/traces/.gitkeep
+!tests/eval/results/.gitkeep
+!artifacts/traces/.gitkeep
+!artifacts/grade_results/.gitkeep
+
+# ==============================================================================
+# Frontend & Node.js
+# ==============================================================================
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+node_modules/
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ==============================================================================
+# Cloud, Terraform, and Secret Credentials
+# ==============================================================================
+.terraform/
+.terraform*
+*.tfstate
+*.tfstate.*
+my_env.tfvars
+*.tfvars
+
+# Private keys, Service Accounts, and credentials
+*.pem
+*.key
+*-key.json
+credentials*.json
+service-account*.json
+.google-agents-cli/
+.agents-cli-scripts/
+.persist_vector_store
+.saved_chats
+.locust_env
+
+# ==============================================================================
+# IDEs and Operating System files
+# ==============================================================================
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.sublime-workspace
+*.swp
+*.swo
+*~
+tmp*

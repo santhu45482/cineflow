@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "QAAuditReport",
+  "type": "object",
+  "required": ["shot_id", "overall_score", "verdict", "findings"],
+  "properties": {
+    "shot_id": { "type": "string" },
+    "overall_score": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+    "verdict": { "type": "string", "enum": ["APPROVED", "WARNING", "REJECTED"] },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["category", "severity", "description"],
+        "properties": {
+          "category": { "type": "string" },
+          "severity": { "type": "string", "enum": ["LOW", "MEDIUM", "HIGH"] },
+          "description": { "type": "string" }
+        }
+      }
+    }
+  }
+}

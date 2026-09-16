@@ -1,0 +1,108 @@
+{
+  "criteria": {
+    "tool_trajectory_avg_score": {
+      "threshold": 0.9,
+      "match_type": "IN_ORDER"
+    },
+    "rubric_based_tool_use_quality_v1": {
+      "threshold": 0.8,
+      "judge_model_options": {
+        "judge_model": "gemini-flash-latest",
+        "num_samples": 3
+      },
+      "rubrics": [
+        {
+          "rubric_id": "optics_injected",
+          "rubric_content": {
+            "text_property": "The agent propagates aspect_ratio 2.39:1 to storyboard tools."
+          }
+        },
+        {
+          "rubric_id": "character_seed_preserved",
+          "rubric_content": {
+            "text_property": "The agent passes the registered character seed token to all visual asset tools."
+          }
+        }
+      ]
+    },
+    "rubric_based_multi_turn_trajectory_quality_v1": {
+      "threshold": 0.8,
+      "judge_model_options": {
+        "judge_model": "gemini-flash-latest",
+        "num_samples": 3
+      },
+      "rubrics": [
+        {
+          "rubric_id": "hitl_gate_interception",
+          "rubric_content": {
+            "text_property": "The agent pauses for human director review at Gate 1 and incorporates director notes."
+          }
+        }
+      ]
+    },
+    "hallucinations_v1": {
+      "threshold": 0.8,
+      "judge_model_options": {
+        "judge_model": "gemini-flash-latest"
+      },
+      "evaluate_intermediate_nl_responses": true
+    },
+    "hitl_gate_enforcement_metric": 1.0,
+    "character_continuity_metric": 1.0,
+    "runtime_optics_compliance_metric": 1.0,
+    "sre_fault_isolation_metric": 1.0,
+    "model_failover_recovery_metric": 1.0,
+    "mode_routing_compliance_metric": 1.0,
+    "gateway_governance_metric": 1.0
+  },
+  "custom_metrics": {
+    "hitl_gate_enforcement_metric": {
+      "code_config": {
+        "name": "tests.eval.custom_metrics.hitl_gate_enforcement_metric"
+      },
+      "description": "Verifies asset generation tools are never executed prior to Gate 1 human approval."
+    },
+    "character_continuity_metric": {
+      "code_config": {
+        "name": "tests.eval.custom_metrics.character_continuity_metric"
+      },
+      "description": "Verifies persistent seed tokens and voice presets remain invariant across turns."
+    },
+    "runtime_optics_compliance_metric": {
+      "code_config": {
+        "name": "tests.eval.custom_metrics.runtime_optics_compliance_metric"
+      },
+      "description": "Validates StudioRuntimeConfig optics parameters are preserved downstream."
+    },
+    "sre_fault_isolation_metric": {
+      "code_config": {
+        "name": "tests.eval.custom_metrics.sre_fault_isolation_metric"
+      },
+      "description": "Asserts SRE telemetry alerts invoke only SRE triage tools and never production pipeline tools."
+    },
+    "model_failover_recovery_metric": {
+      "code_config": {
+        "name": "tests.eval.custom_metrics.model_failover_recovery_metric"
+      },
+      "description": "Validates that model errors trigger pre-yield failover to fallback models without unhandled tracebacks."
+    },
+    "mode_routing_compliance_metric": {
+      "code_config": {
+        "name": "tests.eval.custom_metrics.mode_routing_compliance_metric"
+      },
+      "description": "Enforces that draft mode requests never call full asset generation tools."
+    },
+    "gateway_governance_metric": {
+      "code_config": {
+        "name": "tests.eval.custom_metrics.gateway_governance_metric"
+      },
+      "description": "Verifies that adversarial injections and policy violations are intercepted cleanly by Model Armor/Gateway."
+    }
+  },
+  "user_simulator_config": {
+    "type": "llm_backed",
+    "model": "gemini-flash-latest",
+    "max_allowed_invocations": 15,
+    "include_function_calls": true
+  }
+}

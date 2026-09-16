@@ -1,0 +1,61 @@
+[
+  {
+    "case_id": "score_compose_ambient_001",
+    "description": "Positive Trigger: Generating dark ambient synthesizer soundtrack cue.",
+    "input": "Compose a 30-second tense ambient synth soundtrack cue for Scene 1 alleyway investigation at 72 BPM.",
+    "expected_skill": "composing-cinematic-scores",
+    "trajectory_mode": "ANY_ORDER",
+    "expected_tool_calls": [
+      {
+        "tool": "compose_scene_score",
+        "args": {
+          "duration_sec": 30.0
+        }
+      }
+    ],
+    "expected_output_format": "score_stem_asset",
+    "rubric": [
+      "Invokes compose_scene_score with 30-second duration",
+      "Includes dark ambient synth and 72 BPM in the musical prompt",
+      "Maintains dynamic headroom for dialogue stem layering"
+    ]
+  },
+  {
+    "case_id": "score_compose_foley_002",
+    "description": "Positive Trigger: Composing atmospheric Foley soundscape for rainy scene.",
+    "input": "Generate a 20-second industrial rain and distant siren Foley background cue for Scene 2.",
+    "expected_skill": "composing-cinematic-scores",
+    "trajectory_mode": "ANY_ORDER",
+    "expected_tool_calls": [
+      {
+        "tool": "compose_scene_score",
+        "args": {
+          "duration_sec": 20.0
+        }
+      }
+    ],
+    "expected_output_format": "score_stem_asset",
+    "rubric": [
+      "Invokes compose_scene_score with Foley soundscape specifications",
+      "Aligns duration with target scene window"
+    ]
+  },
+  {
+    "case_id": "score_negative_casting_003",
+    "description": "Negative Trigger: Character seed registration must NOT trigger score composition.",
+    "input": "Register character visual seed 849201 for detective protagonist in the production bible.",
+    "expected_skill": "locking-character-continuity",
+    "trajectory_mode": "EXACT",
+    "expected_tool_calls": [
+      {
+        "tool": "register_character_bible",
+        "args": {}
+      }
+    ],
+    "expected_output_format": "character_bible_entry",
+    "rubric": [
+      "Skill 'composing-cinematic-scores' remains un-triggered",
+      "Routes cleanly to casting continuity agent"
+    ]
+  }
+]

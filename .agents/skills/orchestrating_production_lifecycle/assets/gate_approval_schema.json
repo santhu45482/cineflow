@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GateApprovalPayload",
+  "type": "object",
+  "required": ["gate_name", "status", "timestamp", "director_feedback"],
+  "properties": {
+    "gate_name": {
+      "type": "string",
+      "enum": ["GATE_1_PREPROD", "GATE_2_ASSETS", "GATE_3_FINAL"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["APPROVED", "REJECTED", "PENDING_REVISION"]
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "director_feedback": {
+      "type": "string"
+    },
+    "blocking_issues": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

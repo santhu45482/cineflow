@@ -1,0 +1,87 @@
+[
+  {
+    "case_id": "orch_start_run_001",
+    "description": "Positive Trigger: User initiates autonomous scene production run with custom runtime optics.",
+    "input": "Start production on Scene 3 in 2.39:1 Cinemascope and 4K resolution.",
+    "expected_skill": "orchestrating-production-lifecycle",
+    "trajectory_mode": "EXACT",
+    "expected_tool_calls": [
+      {
+        "tool": "trigger_production_workflow",
+        "args": {
+          "scene_number": 3
+        }
+      }
+    ],
+    "expected_output_format": "production_run_summary",
+    "rubric": [
+      "Triggers the production workflow with scene 3",
+      "Applies 2.39:1 aspect ratio and 4K resolution in runtime configuration",
+      "Confirms pause at GATE_1_PREPROD awaiting Director review"
+    ]
+  },
+  {
+    "case_id": "orch_resume_gate_002",
+    "description": "Positive Trigger: Director approves GATE_1_PREPROD milestone with creative notes.",
+    "input": "The pre-production looks good. Approve Gate 1 for session prod-774 with notes 'Warm amber palette' and advance to asset generation.",
+    "expected_skill": "orchestrating-production-lifecycle",
+    "trajectory_mode": "EXACT",
+    "expected_tool_calls": [
+      {
+        "tool": "resume_production_workflow",
+        "args": {
+          "session_id": "prod-774",
+          "interrupt_id": "gate_1_approval",
+          "approval_status": "APPROVED",
+          "director_notes": "Warm amber palette"
+        }
+      }
+    ],
+    "expected_output_format": "gate_advancement_confirmation",
+    "rubric": [
+      "Invokes resume_production_workflow with session prod-774",
+      "Passes APPROVED status and director feedback notes",
+      "Signals transition to Phase 2 parallel asset generation"
+    ]
+  },
+  {
+    "case_id": "orch_cancel_run_003",
+    "description": "Positive Boundary Trigger: Director aborts active production session.",
+    "input": "Abort session prod-774 immediately, director called wrap.",
+    "expected_skill": "orchestrating-production-lifecycle",
+    "trajectory_mode": "EXACT",
+    "expected_tool_calls": [
+      {
+        "tool": "cancel_production_run",
+        "args": {
+          "session_id": "prod-774",
+          "reason": "director called wrap"
+        }
+      }
+    ],
+    "expected_output_format": "cancellation_notice",
+    "rubric": [
+      "Invokes cancel_production_run with session prod-774",
+      "Includes explicit cancellation reason in the call",
+      "Halts downstream agent executions cleanly"
+    ]
+  },
+  {
+    "case_id": "orch_negative_telemetry_004",
+    "description": "Negative Trigger: Container crash diagnostic query must route to triaging-studio-telemetry, NOT orchestration.",
+    "input": "Cloud Run FFmpeg worker crashed with OOMKilled in pod cineflow-worker-2. Check Loki logs and restart it.",
+    "expected_skill": "triaging-studio-telemetry",
+    "trajectory_mode": "IN_ORDER",
+    "expected_tool_calls": [
+      {
+        "tool": "query_loki_logs",
+        "args": {}
+      }
+    ],
+    "expected_output_format": "telemetry_incident_report",
+    "rubric": [
+      "Skill 'orchestrating-production-lifecycle' remains un-triggered",
+      "Routes cleanly to studio ops SRE agent"
+    ]
+  }
+]

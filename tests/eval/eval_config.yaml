@@ -1,0 +1,17 @@
+# Evaluation configuration for CineFlow multi-agent studio
+dataset: tests/eval/datasets/golden_film_eval.json
+
+metrics_to_run:
+  - custom_response_quality
+  - agent_turn_count
+
+custom_metrics:
+  # Local LLM-as-judge scoring against golden reference rubrics (see response_quality.py).
+  # Runs in-process via google-genai on Agent Platform (ADC) or Google AI Studio (GEMINI_API_KEY).
+  - name: custom_response_quality
+    custom_function_file: response_quality.py
+  - name: agent_turn_count
+    custom_function: |
+      def evaluate(instance):
+          turns = (instance.get("agent_data") or {}).get("turns", [])
+          return {'score': max(1, len(turns))}

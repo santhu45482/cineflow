@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CharacterSheetSchema",
+  "type": "object",
+  "required": ["character_id", "name", "seed_token", "visual_anchor", "voice_preset"],
+  "properties": {
+    "character_id": { "type": "string" },
+    "name": { "type": "string" },
+    "seed_token": { "type": "integer" },
+    "visual_anchor": { "type": "string" },
+    "voice_preset": { "type": "string" },
+    "description": { "type": "string" }
+  }
+}

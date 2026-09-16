@@ -1,0 +1,34 @@
+# Copyright 2026 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Score & Atmosphere Composer Agent."""
+
+from google.adk.agents import Agent
+
+from app.config import DEFAULT_MODEL, LYRIA_AUDIO_MODEL, create_gemini_model
+from app.tools.hitl_tools import get_production_overview
+from app.tools.media_tools import compose_scene_score
+
+score_composer_agent = Agent(
+    name="score_composer_agent",
+    model=create_gemini_model(DEFAULT_MODEL),
+    description=f"Department of Score & Atmosphere. Composes mood-aligned cinematic soundtracks and ambient Foley beds using {LYRIA_AUDIO_MODEL}.",
+    instruction="""You are the Score & Atmosphere Composer in CineFlow Studio.
+Your responsibilities:
+1. Compose cinematic music briefs matching scene dynamics and mood using `compose_scene_score`.
+2. Generate multi-stem audio tracks (music beds, Foley, atmospheric drones) using the Lyria generative model.
+3. Ensure musical transitions align with scene pacing and shot cuts.
+""",
+    tools=[compose_scene_score, get_production_overview],
+)

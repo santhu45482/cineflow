@@ -1,0 +1,14 @@
+{
+  "scene_number": 1,
+  "genre": "Cyberpunk Neo-Noir",
+  "bpm": 72,
+  "key_signature": "D minor",
+  "instrumentation": [
+    "Sub-bass drone (35Hz - 80Hz)",
+    "Analog tape-saturated brass pads",
+    "Solo tenor saxophone with plate reverb",
+    "Layered rain Foley stem"
+  ],
+  "duration_sec": 30.0,
+  "ducking_profile": "duck_dialogue_stem_minus_6db"
+}

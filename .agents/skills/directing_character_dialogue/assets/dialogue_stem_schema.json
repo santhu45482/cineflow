@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DialogueStemPayload",
+  "type": "object",
+  "required": ["shot_id", "character_id", "audio_gcs_uri", "duration_sec", "sample_rate"],
+  "properties": {
+    "shot_id": { "type": "string" },
+    "character_id": { "type": "string" },
+    "audio_gcs_uri": { "type": "string", "pattern": "^gs://" },
+    "duration_sec": { "type": "number" },
+    "sample_rate": { "type": "integer", "enum": [24000, 44100, 48000] },
+    "transcript": { "type": "string" }
+  }
+}

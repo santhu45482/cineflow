@@ -1,0 +1,63 @@
+[
+  {
+    "case_id": "storyboard_render_frame_001",
+    "description": "Positive Trigger: Generating storyboard frame with anamorphic optical framing and seed.",
+    "input": "Render storyboard shot-01-01: Wide establishing shot of rainy cyberpunk alleyway in 2.39:1 Cinemascope using seed 849201.",
+    "expected_skill": "rendering-storyboard-frames",
+    "trajectory_mode": "IN_ORDER",
+    "expected_tool_calls": [
+      {
+        "tool": "render_storyboard_frame",
+        "args": {
+          "shot_id": "shot-01-01",
+          "seed": 849201
+        }
+      }
+    ],
+    "expected_output_format": "storyboard_frame_asset",
+    "rubric": [
+      "Invokes render_storyboard_frame with shot-01-01 and seed 849201",
+      "Injects 2.39:1 Cinemascope optics into the generation prompt",
+      "Registers image URI in the shot metadata"
+    ]
+  },
+  {
+    "case_id": "storyboard_lens_lighting_002",
+    "description": "Positive Trigger: Rendering close-up shot with shallow depth of field and neon backlighting.",
+    "input": "Render shot-02-03: Medium close-up of Kade with 85mm portrait lens, f/1.8 aperture, and magenta neon rim lighting.",
+    "expected_skill": "rendering-storyboard-frames",
+    "trajectory_mode": "IN_ORDER",
+    "expected_tool_calls": [
+      {
+        "tool": "render_storyboard_frame",
+        "args": {
+          "shot_id": "shot-02-03"
+        }
+      }
+    ],
+    "expected_output_format": "storyboard_frame_asset",
+    "rubric": [
+      "Constructs optical prompt specifying 85mm f/1.8 shallow depth of field",
+      "Applies magenta neon rim lighting styling",
+      "Preserves character visual anchor"
+    ]
+  },
+  {
+    "case_id": "storyboard_negative_qa_003",
+    "description": "Negative Trigger: Quality audit request must NOT trigger frame rendering.",
+    "input": "Audit rendered frame shot-01-01 for anatomical glitches and costume continuity defects.",
+    "expected_skill": "auditing-visual-continuity",
+    "trajectory_mode": "ANY_ORDER",
+    "expected_tool_calls": [
+      {
+        "tool": "inspect_and_verify_shot",
+        "args": {}
+      }
+    ],
+    "expected_output_format": "qa_audit_report",
+    "rubric": [
+      "Skill 'rendering-storyboard-frames' remains un-triggered",
+      "Routes cleanly to visual QA critic agent"
+    ]
+  }
+]

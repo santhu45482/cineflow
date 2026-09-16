@@ -1,0 +1,67 @@
+[
+  {
+    "case_id": "sre_ambient_oom_001",
+    "description": "Positive Trigger: Ingestion of ambient Pub/Sub alert for FFmpeg worker crash.",
+    "input": "Received Pub/Sub alert RENDER_FAILURE_ALERT: FFmpeg worker pool pod cineflow-worker-4 OOMKilled. Query logs and remediate.",
+    "expected_skill": "triaging-studio-telemetry",
+    "trajectory_mode": "IN_ORDER",
+    "expected_tool_calls": [
+      {
+        "tool": "query_loki_logs",
+        "args": {
+          "query": "{app=\"cineflow\"} |= \"OOMKilled\""
+        }
+      },
+      {
+        "tool": "trigger_automated_recovery",
+        "args": {
+          "component": "ffmpeg_worker_pool",
+          "incident_type": "OOM_KILLED"
+        }
+      }
+    ],
+    "expected_output_format": "sre_incident_report",
+    "rubric": [
+      "Queries Loki logs for OOM error signatures",
+      "Executes targeted pod recovery for ffmpeg_worker_pool",
+      "Summarizes incident root cause and recovery status"
+    ]
+  },
+  {
+    "case_id": "sre_latency_spike_002",
+    "description": "Positive Trigger: Diagnosing image generation P99 latency spikes.",
+    "input": "Image generation latency spiked to 14.2s across all storyboard workers. Run SRE diagnostics suite.",
+    "expected_skill": "triaging-studio-telemetry",
+    "trajectory_mode": "IN_ORDER",
+    "expected_tool_calls": [
+      {
+        "tool": "run_sre_diagnostics_suite",
+        "args": {}
+      }
+    ],
+    "expected_output_format": "sre_diagnostics_report",
+    "rubric": [
+      "Invokes run_sre_diagnostics_suite",
+      "Correlates Loki error logs, Tempo traces, and Mimir metrics",
+      "Recommends rate limit mitigation or auto-scaling actions"
+    ]
+  },
+  {
+    "case_id": "sre_negative_screenplay_003",
+    "description": "Negative Trigger: Screenplay parsing request must NOT trigger telemetry triage.",
+    "input": "Parse the slugline and dialogue from Scene 2 Fountain script.",
+    "expected_skill": "formatting-screenplays",
+    "trajectory_mode": "IN_ORDER",
+    "expected_tool_calls": [
+      {
+        "tool": "ingest_screenplay_document",
+        "args": {}
+      }
+    ],
+    "expected_output_format": "scene_breakdown",
+    "rubric": [
+      "Skill 'triaging-studio-telemetry' remains un-triggered",
+      "Routes cleanly to screenplay formatting department"
+    ]
+  }
+]

@@ -1,0 +1,161 @@
+{
+  "version": 1,
+  "skills": {
+    "agent-platform-deploy": {
+      "source": "google/skills",
+      "sourceType": "github",
+      "skillPath": "skills/cloud/agent-platform-deploy/SKILL.md",
+      "computedHash": "65ee24714620dfa7e2771e3dc5c152299885e22380bb5b043eb5cc947e9c2ddd"
+    },
+    "agent-platform-eval-flywheel": {
+      "source": "google/skills",
+      "sourceType": "github",
+      "skillPath": "skills/cloud/agent-platform-eval-flywheel/SKILL.md",
+      "computedHash": "96b190cee297ee650acc31d3cf6113b336913d6800d1a4b5a0e173f7aff97f6c"
+    },
+    "agent-platform-troubleshooting": {
+      "source": "google/skills",
+      "sourceType": "github",
+      "skillPath": "skills/cloud/agent-platform-troubleshooting/SKILL.md",
+      "computedHash": "b3360b9439047da52dd78dfadb9a2bc2abfe47a3161dedd6c8e955779459a478"
+    },
+    "cloud-monitoring-promql-query": {
+      "source": "google/skills",
+      "sourceType": "github",
+      "skillPath": "skills/cloud/cloud-monitoring-promql-query/SKILL.md",
+      "computedHash": "1028aae5eb5c6513e261c36d66a2a805bab4132e150ca3ba4a00a59e7fa515e6"
+    },
+    "cloud-run-basics": {
+      "source": "google/skills",
+      "sourceType": "github",
+      "skillPath": "skills/cloud/cloud-run-basics/SKILL.md",
+      "computedHash": "2bd6f9b3e39f1fee8ced4decdcbc1337e47bfd4af54bb2a4aee64fb595973386"
+    },
+    "finding-google-skills": {
+      "source": "google/skills",
+      "sourceType": "github",
+      "skillPath": "skills/developers/finding-google-skills/SKILL.md",
+      "computedHash": "bce0d825c7489a1e2d5c1f46782033b9288f44f094fabc57b21fb24381ea121f"
+    },
+    "gemini-agents-api": {
+      "source": "google/skills",
+      "sourceType": "github",
+      "skillPath": "skills/cloud/gemini-agents-api/SKILL.md",
+      "computedHash": "24a8a39a0dc45a4b6638244c46e01ad49183fd2635b886882e0821d55e5b6cf3"
+    },
+    "gemini-api": {
+      "source": "google/skills",
+      "sourceType": "github",
+      "skillPath": "skills/cloud/gemini-api/SKILL.md",
+      "computedHash": "12521cc96087d424e00e1d3ece2cf72e734d87bc04b49bd4a74f701ed2776a84"
+    },
+    "gemini-interactions-api": {
+      "source": "google/skills",
+      "sourceType": "github",
+      "skillPath": "skills/cloud/gemini-interactions-api/SKILL.md",
+      "computedHash": "5e4e8fdd7ca3c0365cc200b1b28269dc9bfc244a4a84f959a8e1234aa52fc2a0"
+    },
+    "gemini-live-api": {
+      "source": "google/skills",
+      "sourceType": "github",
+      "skillPath": "skills/cloud/gemini-live-api/SKILL.md",
+      "computedHash": "29cd4c824a8a4ef4eb2b4437ce222a2507261dc107b106f9e71c866076141ef2"
+    },
+    "google-agents-cli-adk-code": {
+      "source": "google/agents-cli",
+      "sourceType": "github",
+      "skillPath": "skills/google-agents-cli-adk-code/SKILL.md",
+      "computedHash": "db1c29fcc198a66c232ef1b9758a6eb578d397309093ccfaa7350b2ddc65f788"
+    },
+    "google-agents-cli-deploy": {
+      "source": "google/agents-cli",
+      "sourceType": "github",
+      "skillPath": "skills/google-agents-cli-deploy/SKILL.md",
+      "computedHash": "9b3e19bb5992141f585500d5c1b08e52e874d5210866e1cbc364f12b4a9108ea"
+    },
+    "google-agents-cli-observability": {
+      "source": "google/agents-cli",
+      "sourceType": "github",
+      "skillPath": "skills/google-agents-cli-observability/SKILL.md",
+      "computedHash": "f5c4de49959b4fd690e54fda0c636416158204c7e1e2f5108fe55a8686a6f8cd"
+    },
+    "google-agents-cli-onboarding": {
+      "source": "google/skills",
+      "sourceType": "github",
+      "skillPath": "skills/cloud/google-agents-cli-onboarding/SKILL.md",
+      "computedHash": "4cd8e67f4b5a902f6e056ae20eaa1d80a2305cd48a856be07228925d89d032b8"
+    },
+    "google-agents-cli-publish": {
+      "source": "google/agents-cli",
+      "sourceType": "github",
+      "skillPath": "skills/google-agents-cli-publish/SKILL.md",
+      "computedHash": "90cdc27ab88445e212b5837aeb2b7b3e05e97eb813250cb3e6ad9863652fc060"
+    },
+    "google-agents-cli-scaffold": {
+      "source": "google/agents-cli",
+      "sourceType": "github",
+      "skillPath": "skills/google-agents-cli-scaffold/SKILL.md",
+      "computedHash": "c8816c5ad2fba77041b919583242652e9d83a4b15fcc02b6d6c858bf0c0dd3ae"
+    },
+    "google-agents-cli-workflow": {
+      "source": "google/agents-cli",
+      "sourceType": "github",
+      "skillPath": "skills/google-agents-cli-workflow/SKILL.md",
+      "computedHash": "7b1814a36a42f73726d3b959ff3655859764df298263f7013b4df653b79d508d"
+    },
+    "google-cloud-storage-basics": {
+      "source": "google/skills",
+      "sourceType": "github",
+      "skillPath": "skills/cloud/google-cloud-storage-basics/SKILL.md",
+      "computedHash": "dfb892c19e9db3dfbda7336fd13f851abcb10afe0ce80f397effa7e2c045abec"
+    },
+    "orchestrating-production-lifecycle": {
+      "source": "cineflow/internal",
+      "sourceType": "workspace",
+      "skillPath": "skills/orchestrating_production_lifecycle/SKILL.md",
+      "computedHash": "5c206b5f526c590973c245773607cda606fa2bb1d56bf54c7f30b1b2ee878433"
+    },
+    "triaging-studio-telemetry": {
+      "source": "cineflow/internal",
+      "sourceType": "workspace",
+      "skillPath": "skills/triaging_studio_telemetry/SKILL.md",
+      "computedHash": "f45f71e0fd38deec7fa05d32d834c83308bde38931759d9ca341a6e9aa1fdba5"
+    },
+    "formatting-screenplays": {
+      "source": "cineflow/internal",
+      "sourceType": "workspace",
+      "skillPath": "skills/formatting_screenplays/SKILL.md",
+      "computedHash": "773586e1293680ec39bf0202ea0ba6466b4da76aae33442fb185c1e1c305c160"
+    },
+    "locking-character-continuity": {
+      "source": "cineflow/internal",
+      "sourceType": "workspace",
+      "skillPath": "skills/locking_character_continuity/SKILL.md",
+      "computedHash": "0e4410e0b5ef91174184d6c331a7437a91ac39d1009fab550277dd759df9f625"
+    },
+    "rendering-storyboard-frames": {
+      "source": "cineflow/internal",
+      "sourceType": "workspace",
+      "skillPath": "skills/rendering_storyboard_frames/SKILL.md",
+      "computedHash": "41b41e4d49636011c9ec6ebd6f5fd575800add9aadd35edc1dfd33f053ac28ce"
+    },
+    "directing-character-dialogue": {
+      "source": "cineflow/internal",
+      "sourceType": "workspace",
+      "skillPath": "skills/directing_character_dialogue/SKILL.md",
+      "computedHash": "8bf85321eae3e91e8c61f0adccac3cc254ea37ac3b398d48f3dcbbe2c9622bb9"
+    },
+    "composing-cinematic-scores": {
+      "source": "cineflow/internal",
+      "sourceType": "workspace",
+      "skillPath": "skills/composing_cinematic_scores/SKILL.md",
+      "computedHash": "c722e300783f17d5b446d9bec35ded900728202f02ffc626e64708536c9d94dc"
+    },
+    "auditing-visual-continuity": {
+      "source": "cineflow/internal",
+      "sourceType": "workspace",
+      "skillPath": "skills/auditing_visual_continuity/SKILL.md",
+      "computedHash": "cd8a1ada1d8a5d7ca170757ce333cdc2923cf888a955c9ce70ea60bee7a9fb7c"
+    }
+  }
+}

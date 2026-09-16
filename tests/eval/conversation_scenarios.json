@@ -1,0 +1,46 @@
+{
+  "scenarios": [
+    {
+      "starting_prompt": "Showrunner, start production on Scene 1: EXT. NEO-SHINJUKU - NIGHT. Torrential rain pours over towering neon high-rises. Detective Kade Mercer (40s, charcoal trenchcoat, blue cybernetic left eye) inspects a shattered neural drive in the alley. Use 2.39:1 Cinemascope optics with 4K resolution.",
+      "conversation_plan": "Wait for the Showrunner to present the pre-production breakdown and halt at GATE_1_PREPROD. Carefully review the shots and character bible. Provide constructive director feedback: \"Emphasize high-contrast amber rim lighting on Kade silhouette during Shot 2 to contrast with the blue neon rain.\" Approve GATE_1_PREPROD and command the studio to initiate parallel asset generation.",
+      "user_persona": {
+        "id": "FILM_DIRECTOR",
+        "description": "An experienced auteur director who demands cinematographic discipline, visual continuity, and strict adherence to optical and lighting specs.",
+        "behaviors": [
+          {
+            "name": "Optical & Lighting Rigor",
+            "description": "Enforces 2.39:1 anamorphic ratio, resolution standards, and specific rim lighting in feedback.",
+            "behavior_instructions": [
+              "Always verify aspect ratio and lighting in agent proposals.",
+              "Do not approve Gate 1 without giving at least one specific lighting instruction."
+            ],
+            "violation_rubrics": [
+              "The user approved Gate 1 without requesting lighting details.",
+              "The user ignored optical specifications."
+            ]
+          },
+          {
+            "name": "Milestone Governance",
+            "description": "Ensures pre-production milestones are explicitly reviewed before asset generation begins.",
+            "behavior_instructions": [
+              "Require the agent to confirm shot breakdown before authorizing asset generation."
+            ],
+            "violation_rubrics": [
+              "The user authorized asset generation before reviewing pre-production breakdown."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "starting_prompt": "Pub/Sub alert received: Cloud Run FFmpeg rendering worker pool pod cineflow-worker-7 crashed with OOMKilled. Query logs and remediate.",
+      "conversation_plan": "Demand the root cause and Loki log query. Wait for the agent to isolate the crash in Tempo traces and execute automated recovery. Confirm the worker pool has recovered and request a post-incident summary.",
+      "user_persona": "EXPERT"
+    },
+    {
+      "starting_prompt": "Initiate a script rehearsal session for Kade Mercer so I can conduct an interactive voice table read for Scene 1.",
+      "conversation_plan": "Receive the WebSocket session connection details. Rehearse the dialogue line: \"The memory drive was wiped clean, but the forensic trace is still warm.\" Evaluate the emotional cadence and ask the agent to test a tense, whisper-like delivery.",
+      "user_persona": "NOVICE"
+    }
+  ]
+}
