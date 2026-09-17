@@ -13,47 +13,11 @@
       "skillPath": "skills/cloud/agent-platform-eval-flywheel/SKILL.md",
       "computedHash": "96b190cee297ee650acc31d3cf6113b336913d6800d1a4b5a0e173f7aff97f6c"
     },
-    "agent-platform-troubleshooting": {
-      "source": "google/skills",
-      "sourceType": "github",
-      "skillPath": "skills/cloud/agent-platform-troubleshooting/SKILL.md",
-      "computedHash": "b3360b9439047da52dd78dfadb9a2bc2abfe47a3161dedd6c8e955779459a478"
-    },
-    "cloud-monitoring-promql-query": {
-      "source": "google/skills",
-      "sourceType": "github",
-      "skillPath": "skills/cloud/cloud-monitoring-promql-query/SKILL.md",
-      "computedHash": "1028aae5eb5c6513e261c36d66a2a805bab4132e150ca3ba4a00a59e7fa515e6"
-    },
-    "cloud-run-basics": {
-      "source": "google/skills",
-      "sourceType": "github",
-      "skillPath": "skills/cloud/cloud-run-basics/SKILL.md",
-      "computedHash": "2bd6f9b3e39f1fee8ced4decdcbc1337e47bfd4af54bb2a4aee64fb595973386"
-    },
-    "finding-google-skills": {
-      "source": "google/skills",
-      "sourceType": "github",
-      "skillPath": "skills/developers/finding-google-skills/SKILL.md",
-      "computedHash": "bce0d825c7489a1e2d5c1f46782033b9288f44f094fabc57b21fb24381ea121f"
-    },
-    "gemini-agents-api": {
-      "source": "google/skills",
-      "sourceType": "github",
-      "skillPath": "skills/cloud/gemini-agents-api/SKILL.md",
-      "computedHash": "24a8a39a0dc45a4b6638244c46e01ad49183fd2635b886882e0821d55e5b6cf3"
-    },
     "gemini-api": {
       "source": "google/skills",
       "sourceType": "github",
       "skillPath": "skills/cloud/gemini-api/SKILL.md",
       "computedHash": "12521cc96087d424e00e1d3ece2cf72e734d87bc04b49bd4a74f701ed2776a84"
-    },
-    "gemini-interactions-api": {
-      "source": "google/skills",
-      "sourceType": "github",
-      "skillPath": "skills/cloud/gemini-interactions-api/SKILL.md",
-      "computedHash": "5e4e8fdd7ca3c0365cc200b1b28269dc9bfc244a4a84f959a8e1234aa52fc2a0"
     },
     "gemini-live-api": {
       "source": "google/skills",
@@ -79,29 +43,11 @@
       "skillPath": "skills/google-agents-cli-observability/SKILL.md",
       "computedHash": "f5c4de49959b4fd690e54fda0c636416158204c7e1e2f5108fe55a8686a6f8cd"
     },
-    "google-agents-cli-onboarding": {
-      "source": "google/skills",
-      "sourceType": "github",
-      "skillPath": "skills/cloud/google-agents-cli-onboarding/SKILL.md",
-      "computedHash": "4cd8e67f4b5a902f6e056ae20eaa1d80a2305cd48a856be07228925d89d032b8"
-    },
     "google-agents-cli-publish": {
       "source": "google/agents-cli",
       "sourceType": "github",
       "skillPath": "skills/google-agents-cli-publish/SKILL.md",
       "computedHash": "90cdc27ab88445e212b5837aeb2b7b3e05e97eb813250cb3e6ad9863652fc060"
-    },
-    "google-agents-cli-scaffold": {
-      "source": "google/agents-cli",
-      "sourceType": "github",
-      "skillPath": "skills/google-agents-cli-scaffold/SKILL.md",
-      "computedHash": "c8816c5ad2fba77041b919583242652e9d83a4b15fcc02b6d6c858bf0c0dd3ae"
-    },
-    "google-agents-cli-workflow": {
-      "source": "google/agents-cli",
-      "sourceType": "github",
-      "skillPath": "skills/google-agents-cli-workflow/SKILL.md",
-      "computedHash": "7b1814a36a42f73726d3b959ff3655859764df298263f7013b4df653b79d508d"
     },
     "google-cloud-storage-basics": {
       "source": "google/skills",
