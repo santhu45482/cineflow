@@ -2,6 +2,7 @@
 
 [![Google Agent Development Kit](https://img.shields.io/badge/ADK-2.0-blue.svg)](https://cloud.google.com/vertex-ai/docs)
 [![Primary Model](https://img.shields.io/badge/Model-Gemini%203.7%20Flash-orange.svg)](https://deepmind.google/technologies/gemini/)
+[![CI/CD Pipeline](https://github.com/santhu45482/cineflow/actions/workflows/ci-cd.yaml/badge.svg)](https://github.com/santhu45482/cineflow/actions/workflows/ci-cd.yaml)
 [![Evaluation Benchmark](https://img.shields.io/badge/Golden%20Eval-4.95%20%2F%205.00%20(100%25)-success.svg)](tests/eval/results/)
 [![Pre-Deployment Tests](https://img.shields.io/badge/Tests-66%20Passed-brightgreen.svg)](tests/)
 [![Cloud Deployment](https://img.shields.io/badge/Deployment-Vertex%20AI%20Agent%20Runtime-4285F4.svg)](https://cloud.google.com/vertex-ai)
@@ -67,6 +68,23 @@ flowchart TD
 | **🎼 Score & Atmosphere** | `gemini-3.7-flash` | Generates tempo-matched cinematic soundtracks, ambient Foley soundscapes, and multi-stem audio cues (`compose_scene_score`). |
 | **🔍 Multimodal QA Critic** | `gemini-3.7-flash` | Inspects rendered frames against character bibles and action text; detects visual glitches and routes retry signals (`inspect_and_verify_shot`). |
 | **🛠️ Studio Operations SRE** | `gemini-3.7-flash` | Observability across Google Cloud Operations Suite (Cloud Logging, Cloud Trace, Cloud Monitoring); executes automated worker self-healing (`run_sre_diagnostics_suite`). |
+
+---
+
+## 🧩 Specialized Studio Agent Skills (`.agents/skills/`)
+
+Each department agent is equipped with a specialized domain skill conforming to the Google Agent Development Kit skill schema:
+
+| Skill Directory | Target Department Agent | Primary Capabilities |
+| :--- | :--- | :--- |
+| **`formatting_screenplays`** | Screenplay & Lore | Parses Fountain screenplays, decomposes scenes into atomic shot breakdowns, and analyzes emotional tension and dramatic tempo. |
+| **`locking_character_continuity`** | Casting & Continuity | Extracts character profiles, locks deterministic visual seeds, defines visual anchor tokens, and assigns acoustic voice profiles. |
+| **`rendering_storyboard_frames`** | Visual Storyboard | Directs optical framing (2.39:1 Anamorphic, 16:9), focal lengths, volumetric lighting styles, and renders storyboard frames. |
+| **`directing_character_dialogue`** | Voice Director | Directs dialogue audio synthesis, SSML prosody shaping, dramatic timing, and low-latency Gemini Live API real-time table reads. |
+| **`composing_cinematic_scores`** | Score & Atmosphere | Composes scene soundtracks, ambient Foley soundscapes, and multi-stem musical cues aligned with dramatic tension and scene tempo. |
+| **`auditing_visual_continuity`** | Multimodal QA Critic | Performs multimodal frame-vs-script inspection, visual defect detection, and character continuity auditing across rendered shots. |
+| **`orchestrating_production_lifecycle`** | Executive Showrunner | Orchestrates autonomous multi-agent film production lifecycles across pre-production, asset generation, and assembly while governing HITL gates. |
+| **`triaging_studio_telemetry`** | Studio Operations SRE | Triages runtime failures, service latencies, and container errors across studio services using Cloud Logging, Cloud Trace, and Cloud Monitoring with automated self-healing. |
 
 ---
 
@@ -162,6 +180,23 @@ curl -N -X POST "$BASE_URL/run_sse" \
   }"
 ```
 
+### Inspecting Production Telemetry & Distributed Traces
+
+Audit live runtime latencies, Cloud Trace spans, and SRE health directly via `agents-cli`:
+
+```bash
+agents-cli run "Inspect telemetry metrics and trace spans for the last production run." \
+  --url https://us-east1-aiplatform.googleapis.com/v1/projects/862199224023/locations/us-east1/reasoningEngines/1493066421775630336 \
+  --mode adk
+```
+
+### Continuous Integration & Deployment (CI/CD)
+
+CineFlow features an automated GitHub Actions pipeline ([`.github/workflows/ci-cd.yaml`](.github/workflows/ci-cd.yaml)) integrating directly with Google Cloud `cineflow-10` via **Workload Identity Federation (WIF)**:
+
+* **Pull Requests**: Runs unit tests (`pytest tests/unit`), integration tests (`pytest tests/integration`), and validates the React frontend production build (`npm run build`).
+* **Merge to `main`**: Automatically deploys clean code to Vertex AI Agent Runtime (`1493066421775630336`) and publishes the updated agent card to Gemini Enterprise Agent Registry.
+
 ---
 
 ## 🖥️ Studio Frontend Interfaces
@@ -199,7 +234,7 @@ CineFlow provides two interfaces for creative leads and directors:
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/your-username/cineflow.git
+git clone https://github.com/santhu45482/cineflow.git
 cd cineflow
 
 # 2. Set up virtual environment and install dependencies
@@ -214,6 +249,14 @@ cp .env.example .env
 ```bash
 # Run unit and integration tests (66 tests)
 uv run pytest tests/unit tests/integration
+```
+
+### Real-Time Voice Table Read (Gemini Live API)
+
+Conduct interactive, bidirectional low-latency voice rehearsals with cast characters using the Gemini Live API WebSocket:
+
+```bash
+uv run python scripts/live_table_read.py
 ```
 
 ### Interactive Local Playground
@@ -246,25 +289,32 @@ uv run agents-cli eval grade \
 
 ```
 cineflow/
+├── .agents/skills/                    # 8 Domain-Specific Cinema Studio Skills
+│   ├── auditing_visual_continuity/    # Multimodal Frame & Defect QA Auditing
+│   ├── composing_cinematic_scores/    # Lyria Multi-Stem Music & Foley Design
+│   ├── directing_character_dialogue/  # SSML Prosody Shaping & Gemini Live Reads
+│   ├── formatting_screenplays/        # Fountain Parsing & Dramatic Pacing
+│   ├── locking_character_continuity/  # Deterministic Seed & Visual Anchor Locking
+│   ├── orchestrating_production_lifecycle/ # HITL Lifecycle & Milestone Gates
+│   ├── rendering_storyboard_frames/   # Anamorphic Framing & Fast-Draft Renders
+│   └── triaging_studio_telemetry/     # Cloud Operations Suite Triage & SRE Healing
+├── .github/workflows/
+│   └── ci-cd.yaml                     # Single-Project GitHub Actions CI/CD Pipeline
 ├── app/                               # Core Agent Development Kit (ADK) Application
 │   ├── agent.py                       # Executive Showrunner & Department Sub-Agents
 │   ├── config.py                      # Central Model Configurations (Gemini 3.7 Flash)
 │   ├── fast_api_app.py                # FastAPI Production Server (SSE, A2A, WebSockets)
 │   ├── apigee_gateway_plugin.py       # Apigee AI Gateway & Model Armor Plugin
 │   ├── live_rehearsal_service.py      # Gemini Live API Bidirectional Table Reads
-│   ├── sub_agents/                    # Specialized Studio Department Agents
-│   │   ├── screenplay_agent.py        # Fountain Parsing & Pacing Breakdown
-│   │   ├── casting_agent.py           # Character Bible & Deterministic Seed Locking
-│   │   ├── storyboard_agent.py        # Optical Framing & Storyboard Generation
-│   │   ├── audio_director_agent.py    # Expressive Voice Synthesis & Rehearsals
-│   │   ├── score_composer_agent.py    # Lyria-3.5 Cinematic Scores & Foley Beds
-│   │   ├── qa_critic_agent.py         # Multimodal Continuity & Artifact Inspection
-│   │   └── studio_ops_agent.py        # Cloud Logging, Trace, Monitoring & SRE Healing
+│   ├── agents/                        # Specialized Studio Department Sub-Agents
+│   ├── tools/                         # Media, Screenplay, HITL & GCP Telemetry Tools
 │   └── workflows/                     # Resumable Pipeline State Machine & HITL Gates
 ├── frontend/                          # React + Vite + TypeScript Studio Dashboard
 │   ├── src/                           # UI Components, Tabs, and CineFlow API Client
 │   ├── Dockerfile                     # Multi-Stage Node -> Nginx Production Container
 │   └── nginx.conf                     # API & WebSocket Reverse Proxy Configuration
+├── scripts/
+│   └── live_table_read.py             # Interactive Gemini Live API Table Read Runner
 ├── ui/                                # Streamlit Studio Interface
 │   └── app.py                         # Director's Autonomous Production UI
 ├── tests/                             # Comprehensive Test & Evaluation Suites
