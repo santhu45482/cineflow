@@ -162,11 +162,19 @@ def synthesize_audio_foley(
     }
 
 
-def stitch_rough_cut(shot_ids: list[str]) -> dict[str, Any]:
+def stitch_rough_cut(
+    shot_ids: list[str],
+    buffer_size_mb: int = 512,
+    pipe_timeout_sec: int = 60,
+    fallback_buffer: bool = True,
+) -> dict[str, Any]:
     """Invokes containerized Cloud Run FFmpeg worker to mux visual frames, dialogue, and score into animatic .mp4.
 
     Args:
         shot_ids: Ordered list of shot IDs to concatenate and mux.
+        buffer_size_mb: Memory buffer allocation for media stem pipes (default 512MB).
+        pipe_timeout_sec: Timeout threshold for stem upload stream (default 60s).
+        fallback_buffer: Whether to enable auxiliary memory buffer on worker.
 
     Returns:
         Dict with assembled animatic video URI and duration metrics.
@@ -177,12 +185,15 @@ def stitch_rough_cut(shot_ids: list[str]) -> dict[str, Any]:
     return {
         "status": "success",
         "worker": "Cloud Run FFmpeg Container",
+        "buffer_size_mb": buffer_size_mb,
+        "pipe_timeout_sec": pipe_timeout_sec,
+        "fallback_buffer_active": fallback_buffer,
         "shots_assembled": shot_ids,
         "total_shots": len(shot_ids),
         "total_duration_sec": total_duration,
         "video_uri": output_video_uri,
         "container_codec": "h264 / aac",
-        "message": f"Rough cut animatic assembled successfully at {output_video_uri}",
+        "message": f"Rough cut animatic assembled successfully at {output_video_uri} (buffer: {buffer_size_mb}MB)",
     }
 
 
