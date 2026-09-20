@@ -149,8 +149,8 @@ CineFlow was evaluated using the **Google Agent Platform Evaluation Flywheel** a
 CineFlow is deployed on **Google Cloud Vertex AI Agent Runtime** (`cineflow-10` in `us-east1` with `GOOGLE_CLOUD_LOCATION=global`):
 
 * **Reasoning Engine ID**: `projects/862199224023/locations/us-east1/reasoningEngines/1493066421775630336`
-* **Agent Card URL**: [Live Agent Card JSON](https://us-east1-aiplatform.googleapis.com/reasoningEngines/v1/projects/862199224023/locations/us-east1/reasoningEngines/1493066421775630336/api/a2a/app/.well-known/agent-card.json)
-* **Google Cloud Console**: [Vertex AI Agent Engine](https://console.cloud.google.com/vertex-ai/agents/agent-engines/locations/us-east1/agent-engines/1493066421775630336?project=cineflow-10)
+* **Google Cloud Console (Web Dashboard)**: [Vertex AI Agent Engine](https://console.cloud.google.com/vertex-ai/agents/agent-engines/locations/us-east1/agent-engines/1493066421775630336?project=cineflow-10)
+* **Agent REST API Endpoint**: `https://us-east1-aiplatform.googleapis.com/v1/projects/862199224023/locations/us-east1/reasoningEngines/1493066421775630336` *(requires GCP OAuth Bearer Token)*
 
 ### Sending Live Prompts via Server-Sent Events (SSE)
 
