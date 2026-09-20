@@ -1,31 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Clapperboard,
-  FileText,
-  Users,
-  Film,
-  Mic,
-  Activity,
-} from 'lucide-react';
 import { Header } from './components/Header';
-import { Sidebar } from './components/Sidebar';
-import { ShowrunnerTab } from './components/tabs/ShowrunnerTab';
-import { ScreenplayTab } from './components/tabs/ScreenplayTab';
-import { CastingTab } from './components/tabs/CastingTab';
-import { StoryboardTab } from './components/tabs/StoryboardTab';
-import { SoundstageTab } from './components/tabs/SoundstageTab';
+import { GateRibbon } from './components/GateRibbon';
+import { DirectorDeck } from './components/DirectorDeck';
 import { OperationsTab } from './components/tabs/OperationsTab';
+import { OpticsDrawer } from './components/OpticsDrawer';
 import type {
   ProductionOverviewResponse,
   RuntimeOpticsConfig,
 } from './types/cineflow';
-import { checkBackendHealth, getProductionOverview } from './services/api';
+import {
+  checkBackendHealth,
+  getProductionOverview,
+  triggerProductionPipeline,
+} from './services/api';
+import './App.css';
 
 export const App: React.FC = () => {
   const [sessionId, setSessionId] = useState('cineflow-session-001');
-  const [activeTab, setActiveTab] = useState<
-    'showrunner' | 'screenplay' | 'casting' | 'storyboard' | 'soundstage' | 'operations'
-  >('showrunner');
+  const [activeMode, setActiveMode] = useState<'director' | 'operations'>('director');
+  const [isOpticsOpen, setIsOpticsOpen] = useState(false);
+  const [isRunning, setIsRunning] = useState(false);
 
   const [backendHealth, setBackendHealth] = useState({
     online: true,
@@ -135,95 +129,72 @@ export const App: React.FC = () => {
     });
   }, [sessionId]);
 
+  const handleTriggerPipeline = async (premiseText: string) => {
+    setIsRunning(true);
+    try {
+      const res = await triggerProductionPipeline({
+        session_id: sessionId,
+        premise: premiseText,
+        genre: overview.genre,
+        runtime_optics: opticsConfig,
+      });
+      setOverview((prev) => ({
+        ...prev,
+        active_gate: res.active_gate || 'GATE_1_PREPROD',
+      }));
+    } finally {
+      setIsRunning(false);
+    }
+  };
+
   return (
-    <div className="app-container">
-      <Sidebar
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: 'var(--bg-darkest)' }}>
+      {/* 1. Slim Top Navigation Bar with Mode Switcher */}
+      <Header
+        sessionId={sessionId}
+        setSessionId={setSessionId}
+        backendHealth={backendHealth}
+        gcpProject={gcpProject}
+        activeMode={activeMode}
+        setActiveMode={setActiveMode}
+        onOpenOpticsDrawer={() => setIsOpticsOpen(true)}
+      />
+
+      {/* 2. Persistent Universal Gate & Pipeline Ribbon */}
+      <GateRibbon
+        sessionId={sessionId}
+        overview={overview}
+        setOverview={setOverview}
+        isRunning={isRunning}
+        setIsRunning={setIsRunning}
+        onQuickRun={() => handleTriggerPipeline(overview.logline)}
+      />
+
+      {/* 3. Main Operational Viewport */}
+      <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        {activeMode === 'director' ? (
+          <DirectorDeck
+            overview={overview}
+            setOverview={setOverview}
+            sessionId={sessionId}
+            onTriggerPipeline={handleTriggerPipeline}
+            isRunning={isRunning}
+          />
+        ) : (
+          <div style={{ padding: '1.5rem 2rem', flex: 1 }}>
+            <OperationsTab gcpProject={gcpProject} />
+          </div>
+        )}
+      </main>
+
+      {/* 4. Slide-Over Optics & Governance Drawer */}
+      <OpticsDrawer
+        isOpen={isOpticsOpen}
+        onClose={() => setIsOpticsOpen(false)}
         opticsConfig={opticsConfig}
         setOpticsConfig={setOpticsConfig}
         gcpProject={gcpProject}
       />
-
-      <div className="main-content">
-        <Header
-          sessionId={sessionId}
-          setSessionId={setSessionId}
-          backendHealth={backendHealth}
-          gcpProject={gcpProject}
-          activeGate={overview.active_gate}
-        />
-
-        {/* Studio Department Navigation Tabs */}
-        <nav className="tabs-nav">
-          <button
-            className={`tab-btn ${activeTab === 'showrunner' ? 'active' : ''}`}
-            onClick={() => setActiveTab('showrunner')}
-          >
-            <Clapperboard size={16} />
-            Showrunner & Gates
-          </button>
-
-          <button
-            className={`tab-btn ${activeTab === 'screenplay' ? 'active' : ''}`}
-            onClick={() => setActiveTab('screenplay')}
-          >
-            <FileText size={16} />
-            Screenplay & Beats
-          </button>
-
-          <button
-            className={`tab-btn ${activeTab === 'casting' ? 'active' : ''}`}
-            onClick={() => setActiveTab('casting')}
-          >
-            <Users size={16} />
-            Casting & Seeds
-          </button>
-
-          <button
-            className={`tab-btn ${activeTab === 'storyboard' ? 'active' : ''}`}
-            onClick={() => setActiveTab('storyboard')}
-          >
-            <Film size={16} />
-            Storyboard & Visual QA
-          </button>
-
-          <button
-            className={`tab-btn ${activeTab === 'soundstage' ? 'active' : ''}`}
-            onClick={() => setActiveTab('soundstage')}
-          >
-            <Mic size={16} />
-            Soundstage & Live Rehearsal
-          </button>
-
-          <button
-            className={`tab-btn ${activeTab === 'operations' ? 'active' : ''}`}
-            onClick={() => setActiveTab('operations')}
-          >
-            <Activity size={16} />
-            Cloud Operations & SRE
-          </button>
-        </nav>
-
-        {/* Tab Viewport */}
-        {activeTab === 'showrunner' && (
-          <ShowrunnerTab
-            overview={overview}
-            setOverview={setOverview}
-            sessionId={sessionId}
-            opticsConfig={opticsConfig}
-          />
-        )}
-        {activeTab === 'screenplay' && <ScreenplayTab overview={overview} />}
-        {activeTab === 'casting' && (
-          <CastingTab overview={overview} setOverview={setOverview} />
-        )}
-        {activeTab === 'storyboard' && <StoryboardTab overview={overview} />}
-        {activeTab === 'soundstage' && (
-          <SoundstageTab overview={overview} sessionId={sessionId} />
-        )}
-        {activeTab === 'operations' && (
-          <OperationsTab gcpProject={gcpProject} />
-        )}
-      </div>
     </div>
   );
 };

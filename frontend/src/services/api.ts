@@ -182,6 +182,34 @@ export async function resumeProductionGate(payload: {
   };
 }
 
+export async function cancelProductionPipeline(payload: {
+  session_id: string;
+  reason?: string;
+}): Promise<any> {
+  try {
+    const res = await fetch(`${API_BASE}/v1/production/cancel`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        session_id: payload.session_id,
+        reason: payload.reason || 'Production aborted by Director via Studio Console',
+      }),
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (err) {
+    console.warn('API call to /api/v1/production/cancel failed:', err);
+  }
+
+  return {
+    status: 'CANCELLED',
+    session_id: payload.session_id,
+    active_gate: 'IDLE',
+    message: 'Production run successfully cancelled by Director.',
+  };
+}
+
 export async function runSREDiagnostics(): Promise<SREDiagnosticReport> {
   try {
     const res = await fetch(`${API_BASE}/sre/diagnostics`);

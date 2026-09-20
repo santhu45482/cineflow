@@ -96,6 +96,9 @@ async def handle_table_read_websocket(websocket: WebSocket, session_id: str) -> 
         while True:
             # Receive either binary audio chunks or JSON text/control frames
             data = await websocket.receive()
+            if data.get("type") == "websocket.disconnect":
+                logger.info(f"Live Table Read WebSocket disconnected: {session_id}")
+                break
             if data.get("bytes"):
                 # Process binary audio PCM chunk
                 audio_bytes = data["bytes"]
@@ -107,6 +110,9 @@ async def handle_table_read_websocket(websocket: WebSocket, session_id: str) -> 
                         "bytes_length": len(audio_bytes),
                         "input_transcription": "I need answers about what happened in Sector 4.",
                         "model_turn_transcription": "Kade Mercer: Sector 4 is gone. Don't go digging where you can't survive.",
+                        "character": "Kade Mercer",
+                        "text": "Kade Mercer: Sector 4 is gone. Don't go digging where you can't survive.",
+                        "message": "Kade Mercer: Sector 4 is gone. Don't go digging where you can't survive.",
                     }
                 )
             elif data.get("text"):
@@ -122,23 +128,30 @@ async def handle_table_read_websocket(websocket: WebSocket, session_id: str) -> 
                         {
                             "event": "security_block",
                             "error": f"Model Armor Filter: {reason}",
+                            "character": "SYSTEM",
+                            "text": f"Model Armor Filter: {reason}",
+                            "message": f"Model Armor Filter: {reason}",
                         }
                     )
                     continue
 
                 # Return live rehearsal character dialogue response
+                response_text = f'"{sanitized}" — That\'s what you think. But out here in the neon rain, truth is expensive.'
                 await websocket.send_json(
                     {
                         "event": "model_turn",
                         "character": "Kade Mercer",
-                        "dialogue": f'Kade Mercer: "{sanitized}" — That\'s what you think. But out here in the neon rain, truth is expensive.',
+                        "text": response_text,
+                        "dialogue": f"Kade Mercer: {response_text}",
+                        "message": response_text,
                         "timing_cues": {"pause_ms": 400, "tempo_bpm": 70},
                     }
                 )
-    except WebSocketDisconnect:
+    except (WebSocketDisconnect, RuntimeError):
         logger.info(f"Live Table Read WebSocket disconnected: {session_id}")
     except Exception as e:
         logger.error(f"Error in Live Table Read WebSocket: {e}")
+    finally:
         try:
             await websocket.close()
         except Exception:
