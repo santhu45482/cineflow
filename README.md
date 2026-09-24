@@ -4,7 +4,8 @@
 [![Primary Model](https://img.shields.io/badge/Model-Gemini%203.7%20Flash-orange.svg)](https://deepmind.google/technologies/gemini/)
 [![CI/CD Pipeline](https://github.com/santhu45482/cineflow/actions/workflows/ci-cd.yaml/badge.svg)](https://github.com/santhu45482/cineflow/actions/workflows/ci-cd.yaml)
 [![Evaluation Benchmark](https://img.shields.io/badge/Golden%20Eval-4.95%20%2F%205.00%20(100%25)-success.svg)](tests/eval/results/)
-[![Pre-Deployment Tests](https://img.shields.io/badge/Tests-66%20Passed-brightgreen.svg)](tests/)
+[![Pre-Deployment Tests](https://img.shields.io/badge/Tests-68%20Passed-brightgreen.svg)](tests/)
+[![Live Web Studio](https://img.shields.io/badge/Live%20Studio-Cloud%20Run-34A853.svg)](https://cineflow-studio-862199224023.us-east1.run.app)
 [![Cloud Deployment](https://img.shields.io/badge/Deployment-Vertex%20AI%20Agent%20Runtime-4285F4.svg)](https://cloud.google.com/vertex-ai)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
@@ -146,8 +147,15 @@ CineFlow was evaluated using the **Google Agent Platform Evaluation Flywheel** a
 
 ## ☁️ Cloud Deployment & Verification
 
-CineFlow is deployed on **Google Cloud Vertex AI Agent Runtime** (`cineflow-10` in `us-east1` with `GOOGLE_CLOUD_LOCATION=global`):
+CineFlow is deployed across Google Cloud with a dual-target architecture (`cineflow-10` in `us-east1` with `GOOGLE_CLOUD_LOCATION=global`):
 
+### 1. Live Interactive Web Studio (Google Cloud Run)
+* **Live Studio Web URL**: [https://cineflow-studio-862199224023.us-east1.run.app](https://cineflow-studio-862199224023.us-east1.run.app)
+* **Cloud Run Service**: `cineflow-studio`
+* **Unified Web Container**: Hosts the React 19 + Vite frontend Single Page Application (SPA) and FastAPI production pipeline server.
+* **Access**: Publicly accessible web dashboard for directors, casting, and storyboard review.
+
+### 2. Autonomous Reasoning Engine (Google Cloud Vertex AI Agent Runtime)
 * **Reasoning Engine ID**: `projects/862199224023/locations/us-east1/reasoningEngines/1493066421775630336`
 * **Google Cloud Console (Web Dashboard)**: [Vertex AI Agent Engine](https://console.cloud.google.com/vertex-ai/agents/agent-engines/locations/us-east1/agent-engines/1493066421775630336?project=cineflow-10)
 * **Agent REST API Endpoint**: `https://us-east1-aiplatform.googleapis.com/v1/projects/862199224023/locations/us-east1/reasoningEngines/1493066421775630336` *(requires GCP OAuth Bearer Token)*
@@ -204,6 +212,7 @@ CineFlow features an automated GitHub Actions pipeline ([`.github/workflows/ci-c
 CineFlow provides two interfaces for creative leads and directors:
 
 ### 1. Modern React + Vite Studio Web UI (`frontend/`)
+* **Live Studio Deployment**: [https://cineflow-studio-862199224023.us-east1.run.app](https://cineflow-studio-862199224023.us-east1.run.app)
 * **Stack**: React 19, TypeScript, Vite 8, Tailwind CSS, Lucide Icons, Nginx.
 * **Features**: Live HITL gate controls, visual storyboard shot viewer, soundstage stem player, and real-time SRE cluster telemetry dashboard.
 * **Run Locally**:
@@ -247,7 +256,7 @@ cp .env.example .env
 ### Running Tests
 
 ```bash
-# Run unit and integration tests (66 tests)
+# Run unit and integration tests (68 tests, 100% pass rate)
 uv run pytest tests/unit tests/integration
 ```
 
