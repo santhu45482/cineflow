@@ -132,6 +132,20 @@ def test_fastapi_production_routes():
     assert cancel_data.get("status") == "cancelled"
     assert cancel_data.get("session_id") == session_id
 
+    # 4. Resume without matching session / alias 'gate-001' (Regression test for Cloud Logging error)
+    fallback_resp = client.post(
+        "/api/v1/production/resume",
+        json={
+            "session_id": "nonexistent-or-recycled-session",
+            "interrupt_id": "gate-001",
+            "approval_data": {"status": "APPROVED", "notes": "Approved from UI"},
+        },
+    )
+    assert fallback_resp.status_code == 200
+    fallback_data = fallback_resp.json()
+    assert fallback_data["status"] == "SUCCESS"
+    assert fallback_data["active_gate"] == "GATE_2_ASSETS"
+
 
 def test_hitl_cancellation_and_resume_tools():
     """Verify cancel_production_run and resume_production_workflow tools."""

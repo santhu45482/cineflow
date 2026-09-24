@@ -1,0 +1,15 @@
+# Multi-turn evaluation configuration for CineFlow multi-agent studio
+# Used when grading simulated multi-turn traces (e.g. from `agents-cli eval dataset synthesize`)
+
+metrics_to_run:
+  - multi_turn_task_success
+  - multi_turn_trajectory_quality
+  - multi_turn_tool_use_quality
+  - agent_turn_count
+
+custom_metrics:
+  - name: agent_turn_count
+    custom_function: |
+      def evaluate(instance):
+          turns = (instance.get("agent_data") or {}).get("turns", [])
+          return {'score': max(1, len(turns))}

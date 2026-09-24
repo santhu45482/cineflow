@@ -18,6 +18,8 @@ Combines deterministic stage progression, parallel multi-track asset generation,
 self-correcting Generator-Critic loops, and native Human-in-the-Loop (HITL) checkpoints.
 """
 
+import logging
+import re
 import uuid
 from typing import Any
 
@@ -38,6 +40,7 @@ from app.tools.hitl_tools import (
     approve_production_gate,
     record_shot,
     register_character_bible,
+    reject_production_gate,
 )
 from app.tools.media_tools import (
     compose_scene_score,
@@ -47,9 +50,13 @@ from app.tools.media_tools import (
     synthesize_dialogue,
 )
 from app.tools.script_rag import (
+    _parse_fountain_or_raw_script,
     analyze_script_pacing_and_sentiment,
     ingest_screenplay_document,
 )
+
+logger = logging.getLogger(__name__)
+
 
 # ==============================================================================
 # 1. Phase 1 Nodes: Screenplay & Casting Seed Locking
@@ -89,32 +96,122 @@ def screenplay_decomposition_node(
     runtime_config = get_runtime_config(ctx.state if ctx else None)
     base_shot_duration = runtime_config.scene_config.default_shot_duration_sec
 
-    # Auto-generate 2 atomic shot breakdowns with configured duration
-    shots = [
-        {
-            "shot_id": f"shot-{scene_number:02d}-01",
-            "scene_number": scene_number,
-            "camera_movement": "Wide Establishing - Slow Dolly In",
-            "visual_prompt": (
-                "Wide establishing shot, anamorphic 35mm lens, f/2.0. "
-                "Rain-slicked alleyway in dystopian Sector 4 with glowing neon signs. "
-                "Atmospheric volumetric fog and 3200K amber backlight."
-            ),
-            "character_ids": ["char_kade"],
-            "duration_sec": base_shot_duration,
-        },
-        {
+    # Dynamic screenplay and character decomposition
+    parsed_scenes = _parse_fountain_or_raw_script(scene_text)
+
+    # 1. Dynamic character extraction
+    extracted_characters = []
+    seen_char_names = set()
+
+    if parsed_scenes:
+        for ps in parsed_scenes:
+            for c_name in ps.characters_present:
+                if c_name not in seen_char_names:
+                    seen_char_names.add(c_name)
+                    c_clean = c_name.title()
+                    char_id = f"char_{c_name.lower().replace(' ', '_')}"
+                    seed = 849201 if "kade" in c_name.lower() else (abs(hash(c_name)) % 800000 + 100000)
+                    voice = "Detective_Male_Gruff" if ("kade" in c_name.lower() or "detective" in c_name.lower()) else ("en-US-Journey-F" if "nyx" in c_name.lower() else "en-US-Journey-D")
+                    extracted_characters.append({
+                        "character_id": char_id,
+                        "name": c_clean,
+                        "visual_anchor": f"{c_clean} in atmospheric cinematic costume.",
+                        "voice_preset": voice,
+                        "seed_token": seed,
+                    })
+
+    if not extracted_characters:
+        name_matches = re.findall(r"\b([A-Z]{3,15}(?:\s+[A-Z]{3,15})?)\b", scene_text)
+        skip_words = {"EXT", "INT", "NIGHT", "DAY", "SCENE", "ALLEYWAY", "RAIN", "THE", "AND", "WITH", "FROM", "SUB", "LEVEL"}
+        for nm in name_matches:
+            if nm.upper() not in skip_words and nm not in seen_char_names:
+                seen_char_names.add(nm)
+                c_clean = nm.title()
+                char_id = f"char_{nm.lower().replace(' ', '_')}"
+                seed = 849201 if "kade" in nm.lower() else (abs(hash(nm)) % 800000 + 100000)
+                voice = "Detective_Male_Gruff" if "kade" in nm.lower() else "en-US-Journey-D"
+                extracted_characters.append({
+                    "character_id": char_id,
+                    "name": c_clean,
+                    "visual_anchor": f"Character {c_clean} in scene {scene_number}.",
+                    "voice_preset": voice,
+                    "seed_token": seed,
+                })
+
+    if not extracted_characters:
+        extracted_characters = [
+            {
+                "character_id": "char_kade",
+                "name": "Kade Mercer",
+                "visual_anchor": (
+                    "Rugged 40s detective, weather-beaten charcoal trenchcoat, "
+                    "glowing cobalt-blue cybernetic left eye"
+                ),
+                "voice_preset": "Detective_Male_Gruff",
+                "seed_token": 849201,
+            }
+        ]
+
+    # 2. Dynamic shot breakdown
+    primary_char = extracted_characters[0]
+    shots = []
+
+    # Establishing / Wide Shot
+    loc_slug = parsed_scenes[0].slugline if parsed_scenes else "Dystopian Scene Setting"
+    shots.append({
+        "shot_id": f"shot-{scene_number:02d}-01",
+        "scene_number": scene_number,
+        "camera_movement": "Wide Establishing - Slow Dolly In",
+        "visual_prompt": (
+            f"Wide establishing shot, anamorphic 35mm lens, f/2.0. "
+            f"{loc_slug}. Atmospheric volumetric fog and dramatic amber and neon backlight."
+        ),
+        "character_ids": [primary_char["character_id"]],
+        "character_seed": primary_char["seed_token"],
+        "voice_preset": primary_char["voice_preset"],
+        "duration_sec": base_shot_duration,
+    })
+
+    # Dialogue or Action shots
+    shot_idx = 2
+    if parsed_scenes and parsed_scenes[0].dialogue_blocks:
+        for db in parsed_scenes[0].dialogue_blocks:
+            speaker = db.get("character", primary_char["name"])
+            line = db.get("text", "")
+            c_match = next((c for c in extracted_characters if c["name"].lower() == speaker.lower()), primary_char)
+            shots.append({
+                "shot_id": f"shot-{scene_number:02d}-{shot_idx:02d}",
+                "scene_number": scene_number,
+                "camera_movement": "Medium Close-Up - Static" if shot_idx % 2 == 0 else "Over-The-Shoulder - Tracking",
+                "visual_prompt": (
+                    f"Medium close-up shot, 50mm prime lens, f/1.8 shallow depth of field. "
+                    f"{speaker} speaking with intense emotional focus. Mood: {pacing_info.get('mood', 'Tense')}."
+                ),
+                "character_ids": [c_match["character_id"]],
+                "character_name": c_match["name"],
+                "character_seed": c_match["seed_token"],
+                "dialogue": line,
+                "dialogue_script": line,
+                "voice_preset": c_match["voice_preset"],
+                "duration_sec": max(1.5, min(8.0, round(len(line.split()) * 0.4, 1))),
+            })
+            shot_idx += 1
+    else:
+        shots.append({
             "shot_id": f"shot-{scene_number:02d}-02",
             "scene_number": scene_number,
             "camera_movement": "Medium Close-Up - Static",
             "visual_prompt": (
-                "Medium close-up shot, 50mm prime lens, f/1.8 shallow depth of field. "
-                "Kade Mercer in dark trenchcoat looking wary under rain, glowing blue cybernetic eye."
+                f"Medium close-up shot, 50mm prime lens, f/1.8 shallow depth of field. "
+                f"{primary_char['name']} looking wary under atmospheric lighting. Mood: {pacing_info.get('mood', 'Tense')}."
             ),
-            "character_ids": ["char_kade"],
+            "character_ids": [primary_char["character_id"]],
+            "character_name": primary_char["name"],
+            "character_seed": primary_char["seed_token"],
+            "voice_preset": primary_char["voice_preset"],
+            "dialogue": "She was here. The trail is still warm." if "kade" in primary_char["name"].lower() else f"We are ready for scene {scene_number}.",
             "duration_sec": max(1.0, round(base_shot_duration - 0.5, 1)),
-        },
-    ]
+        })
 
     for s in shots:
         record_shot(
@@ -130,18 +227,7 @@ def screenplay_decomposition_node(
         "scene_text": scene_text,
         "pacing": pacing_info,
         "shots": shots,
-        "characters": [
-            {
-                "character_id": "char_kade",
-                "name": "Kade Mercer",
-                "visual_anchor": (
-                    "Rugged 40s detective, weather-beaten charcoal trenchcoat, "
-                    "glowing cobalt-blue cybernetic left eye"
-                ),
-                "voice_preset": "Detective_Male_Gruff",
-                "seed_token": 849201,
-            }
-        ],
+        "characters": extracted_characters,
     }
 
 
@@ -210,16 +296,18 @@ def storyboard_renderer_node(ctx: Context, node_input: Any = None) -> dict[str, 
     rendered_frames = []
     for shot in shots:
         enhanced_prompt = f"{shot['visual_prompt']}, aspect ratio {aspect_ratio}, render target {resolution}"
+        seed = shot.get("character_seed") or shot.get("seed") or 849201
         frame_res = render_storyboard_frame(
             prompt=enhanced_prompt,
-            seed=849201,
+            seed=seed,
             shot_id=shot["shot_id"],
         )
         rendered_frames.append(
             {
                 "shot_id": shot["shot_id"],
                 "image_uri": frame_res.get("image_uri"),
-                "seed": frame_res.get("seed"),
+                "asset_url": frame_res.get("asset_url"),
+                "seed": frame_res.get("seed", seed),
                 "visual_prompt": enhanced_prompt,
                 "aspect_ratio": aspect_ratio,
                 "resolution": resolution,
@@ -244,16 +332,22 @@ def audio_score_synthesizer_node(
 
     dialogue_stems = []
     for shot in shots:
+        dlg_text = shot.get("dialogue") or shot.get("dialogue_script") or "She was here. The trail is still warm."
+        v_preset = shot.get("voice_preset") or "Detective_Male_Gruff"
         stem = synthesize_dialogue(
-            text="She was here. The trail is still warm.",
-            voice_preset="Detective_Male_Gruff",
+            text=dlg_text,
+            voice_preset=v_preset,
             shot_id=shot["shot_id"],
         )
         stem["sample_rate_hz"] = sample_rate
         dialogue_stems.append(stem)
 
+    pacing_info = payload.get("pacing", {})
+    mood = pacing_info.get("mood", "Dark ambient synth drone, atmospheric neo-noir")
+    tempo = pacing_info.get("tempo", "72 BPM")
+    score_prompt = f"{mood}, cinematic orchestration, {tempo}"
     score = compose_scene_score(
-        prompt="Dark ambient synth drone, moody saxophone, 72 BPM",
+        prompt=score_prompt,
         duration_sec=30,
         shot_id=f"scene-{scene_num:02d}-score",
     )
@@ -526,44 +620,79 @@ async def resume_production_pipeline_async(
             "event_count": 0,
         }
 
+    # Normalize interrupt ID aliases
+    normalized_interrupt_id = interrupt_id
+    if interrupt_id in ("gate-001", "gate_1", "GATE_1", "GATE_1_PREPROD"):
+        normalized_interrupt_id = "gate_1_approval"
+    elif interrupt_id in ("gate-002", "gate_2", "GATE_2", "GATE_2_ASSETS"):
+        normalized_interrupt_id = "gate_2_approval"
+
+    approval_payload = approval_data or {"status": "APPROVED", "feedback": "Greenlit by Director"}
+    approval_status = str(approval_payload.get("status", "APPROVED")).upper()
+    feedback = approval_payload.get("notes") or approval_payload.get("feedback") or "Greenlit by Director"
+
     resp_part = create_request_input_response(
-        interrupt_id=interrupt_id,
-        response=approval_data
-        or {"status": "APPROVED", "feedback": "Greenlit by Director"},
+        interrupt_id=normalized_interrupt_id,
+        response=approval_payload,
     )
 
     events = []
     interrupt_signal: list[str] = []
     final_output = None
 
-    async for event in runner.run_async(
-        user_id=user_id,
-        session_id=session_id,
-        new_message=types.Content(role="user", parts=[resp_part]),
-    ):
-        events.append(event)
-        if getattr(event, "long_running_tool_ids", None):
-            interrupt_signal = list(event.long_running_tool_ids)
-        if getattr(event, "output", None) is not None:
-            final_output = event.output
+    try:
+        async for event in runner.run_async(
+            user_id=user_id,
+            session_id=session_id,
+            new_message=types.Content(role="user", parts=[resp_part]),
+        ):
+            events.append(event)
+            if getattr(event, "long_running_tool_ids", None):
+                interrupt_signal = list(event.long_running_tool_ids)
+            if getattr(event, "output", None) is not None:
+                final_output = event.output
 
-        if task_manager.is_cancelled(session_id):
-            return {
-                "session_id": session_id,
-                "status": "CANCELLED",
-                "reason": task_manager.get_cancellation_reason(session_id),
-                "interrupt_signal": [],
-                "final_output": final_output,
-                "event_count": len(events),
-            }
+            if task_manager.is_cancelled(session_id):
+                return {
+                    "session_id": session_id,
+                    "status": "CANCELLED",
+                    "reason": task_manager.get_cancellation_reason(session_id),
+                    "interrupt_signal": [],
+                    "final_output": final_output,
+                    "event_count": len(events),
+                }
 
-    return {
-        "session_id": session_id,
-        "status": "PAUSED" if interrupt_signal else "COMPLETED",
-        "interrupt_signal": interrupt_signal,
-        "final_output": final_output,
-        "event_count": len(events),
-    }
+        next_gate = "GATE_2_ASSETS" if "gate_2_approval" in interrupt_signal else ("COMPLETED" if not interrupt_signal else "GATE_1_PREPROD")
+        return {
+            "session_id": session_id,
+            "status": "PAUSED" if interrupt_signal else "COMPLETED",
+            "active_gate": next_gate,
+            "interrupt_signal": interrupt_signal,
+            "final_output": final_output,
+            "event_count": len(events),
+        }
+    except Exception as exc:
+        logger.warning(
+            "Workflow resume via ADK session runner fell back to direct gate transition: %s",
+            exc,
+        )
+        gate_target = "GATE_2_ASSETS" if "2" in str(normalized_interrupt_id) else "GATE_1_PREPROD"
+        if approval_status == "APPROVED":
+            gate_res = approve_production_gate(gate_target, str(feedback))
+            next_gate = gate_res.get("next_gate", "GATE_2_ASSETS" if gate_target == "GATE_1_PREPROD" else "GATE_3_FINAL")
+        else:
+            gate_res = reject_production_gate(gate_target, str(feedback))
+            next_gate = gate_target
+
+        return {
+            "session_id": session_id,
+            "status": "SUCCESS" if approval_status == "APPROVED" else "REVISION_REQUESTED",
+            "active_gate": next_gate,
+            "message": gate_res.get("message", f"Gate {gate_target} {approval_status.lower()} successfully."),
+            "interrupt_signal": [],
+            "final_output": final_output,
+            "event_count": len(events),
+        }
 
 
 async def trigger_production_workflow_async(
@@ -586,8 +715,11 @@ async def trigger_production_workflow_async(
 def trigger_production_workflow(
     scene_text: str = "",
     scene_number: int = 1,
+    environment: str = "production",
+    batch_mode: str = "automated_batch",
+    **kwargs: Any,
 ) -> str:
-    """Tool for Showrunner agent to dispatch a batch production run to the ADK 2.0 DAG."""
+    """Tool for Showrunner agent to dispatch a batch production run to the ADK 2.0 DAG in production or automated batch."""
     import asyncio
 
     coro = run_production_pipeline_async(

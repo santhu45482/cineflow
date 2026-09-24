@@ -2,6 +2,8 @@
 dataset: tests/eval/datasets/golden_film_eval.json
 
 metrics_to_run:
+  - final_response_quality
+  - safety
   - custom_response_quality
   - agent_turn_count
 

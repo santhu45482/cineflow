@@ -26,7 +26,7 @@ export const ScreenplayTab: React.FC<ScreenplayTabProps> = ({ overview }) => {
           </div>
           <div>
             <span className="form-label">Scene Count</span>
-            <p style={{ fontWeight: 600, color: 'var(--accent)' }}>1 Scene (4 Planned Shots)</p>
+            <p style={{ fontWeight: 600, color: 'var(--accent)' }}>1 Scene ({overview.shots.length} Planned Shots)</p>
           </div>
         </div>
       </div>

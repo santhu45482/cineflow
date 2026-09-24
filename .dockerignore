@@ -1,0 +1,15 @@
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache
+.ruff_cache
+frontend/node_modules
+frontend/dist
+.git
+.gitignore
+.env
+.env.local
+.DS_Store
+studio_assets

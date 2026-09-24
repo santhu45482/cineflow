@@ -40,12 +40,12 @@ def get_grafana_mcp() -> Any:
 
 __all__ = [
     "get_grafana_mcp",
-    "query_loki_logs",
-    "query_tempo_traces",
-    "query_mimir_metrics",
     "query_cloud_logs",
-    "query_cloud_traces",
     "query_cloud_monitoring_metrics",
-    "trigger_automated_recovery",
+    "query_cloud_traces",
+    "query_loki_logs",
+    "query_mimir_metrics",
+    "query_tempo_traces",
     "run_sre_diagnostics_suite",
+    "trigger_automated_recovery",
 ]

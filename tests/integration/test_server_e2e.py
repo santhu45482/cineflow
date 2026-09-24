@@ -273,3 +273,16 @@ def test_reasoning_engine_sync_stream(server_fixture: subprocess.Popen[str]) -> 
         for event in events
     )
     assert has_text, "No text content in reasoning_engine sync events"
+
+
+def test_unified_container_frontend_and_api(server_fixture: subprocess.Popen[str]) -> None:
+    """Test that the unified container serves the React 19 SPA and production API."""
+    # Test root endpoint serves React index.html
+    response = requests.get(BASE_URL, timeout=10)
+    assert response.status_code == 200
+    assert "CineFlow Studio" in response.text or "<div id=\"root\">" in response.text
+
+    # Test custom production API endpoint
+    api_response = requests.get(f"{BASE_URL}/api/production/overview", timeout=10)
+    assert api_response.status_code == 200
+    assert api_response.json().get("status") == "success"

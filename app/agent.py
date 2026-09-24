@@ -18,7 +18,6 @@ from google.adk.agents.context_cache_config import ContextCacheConfig
 from google.adk.apps import App, ResumabilityConfig
 from google.adk.apps.app import EventsCompactionConfig
 from google.adk.apps.llm_event_summarizer import LlmEventSummarizer
-from google.adk.models import Gemini
 
 from app.agents import (
     audio_director_agent,
@@ -66,7 +65,7 @@ app = App(
     events_compaction_config=EventsCompactionConfig(
         token_threshold=32000,
         event_retention_size=6,
-        summarizer=LlmEventSummarizer(llm=Gemini(model=DEFAULT_MODEL)),
+        summarizer=LlmEventSummarizer(llm=create_gemini_model(DEFAULT_MODEL)),
     ),
     context_cache_config=ContextCacheConfig(
         min_tokens=2048,

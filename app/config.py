@@ -42,8 +42,23 @@ APIGEE_PROXY_URL = os.getenv("APIGEE_PROXY_URL")
 APIGEE_API_KEY = os.getenv("APIGEE_API_KEY")
 
 
-def create_gemini_model(model_name: str = DEFAULT_MODEL) -> BaseLlm:
-    """Create a configured Gemini or Apigee-governed LLM instance."""
+# Resilient HTTP Retry Policy for 429 Resource Exhausted and 5xx errors
+DEFAULT_RETRY_OPTIONS = types.HttpRetryOptions(
+    attempts=6,
+    initial_delay=2.0,
+    max_delay=60.0,
+    exp_base=2.0,
+    jitter=1.0,
+    http_status_codes=[429, 500, 503, 504],
+)
+
+
+def create_gemini_model(
+    model_name: str = DEFAULT_MODEL,
+    retry_options: types.HttpRetryOptions | None = None,
+) -> BaseLlm:
+    """Create a configured Gemini or Apigee-governed LLM instance with robust retries."""
+    opts = retry_options or DEFAULT_RETRY_OPTIONS
     if APIGEE_PROXY_URL:
         # Format model string for Apigee proxy routing (apigee/<model_id>)
         apigee_model_str = (
@@ -59,12 +74,12 @@ def create_gemini_model(model_name: str = DEFAULT_MODEL) -> BaseLlm:
             model=apigee_model_str,
             proxy_url=APIGEE_PROXY_URL,
             custom_headers=custom_headers if custom_headers else None,
-            retry_options=types.HttpRetryOptions(attempts=3),
+            retry_options=opts,
         )
 
     return Gemini(
         model=model_name,
-        retry_options=types.HttpRetryOptions(attempts=3),
+        retry_options=opts,
     )
 
 

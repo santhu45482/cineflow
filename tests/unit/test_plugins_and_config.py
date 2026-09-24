@@ -132,3 +132,19 @@ async def test_model_armor_plugin_before_tool_callback():
     assert unsafe_res.get("status") == "error"
     assert unsafe_res.get("blocked") is True
     assert "Model Armor Security Intercept" in unsafe_res.get("reason", "")
+
+
+def test_retry_options_configured():
+    """Verify that models are provisioned with 429 exponential backoff retry options."""
+    from app.config import DEFAULT_RETRY_OPTIONS, create_gemini_model
+
+    assert DEFAULT_RETRY_OPTIONS.attempts >= 5
+    assert 429 in DEFAULT_RETRY_OPTIONS.http_status_codes
+    assert DEFAULT_RETRY_OPTIONS.initial_delay >= 1.0
+    assert DEFAULT_RETRY_OPTIONS.exp_base >= 2.0
+
+    model = create_gemini_model("gemini-2.5-flash")
+    assert model.retry_options is not None
+    assert 429 in model.retry_options.http_status_codes
+    assert model.retry_options.attempts >= 5
+

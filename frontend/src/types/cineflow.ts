@@ -23,6 +23,8 @@ export interface ShotUnit {
   qa_status?: string;
   qa_score?: number;
   image_url?: string;
+  asset_url?: string;
+  image_uri?: string;
   audio_url?: string;
 }
 

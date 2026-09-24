@@ -20,52 +20,75 @@ export const StoryboardTab: React.FC<StoryboardTabProps> = ({ overview }) => {
               Rendered via Gemini 3.1 Flash Image with persistent seeds, optics injection, and automated continuity auditing by Gemini Omni 1.1 Flash.
             </p>
           </div>
-          <span className="badge badge-green">ALL 4 SHOTS QA AUDITED</span>
+          <span className="badge badge-green">{overview.shots.length} SHOTS QA AUDITED</span>
         </div>
       </div>
 
       {/* Shots Grid */}
       <div className="grid-2">
-        {overview.shots.map((shot) => (
-          <div key={shot.shot_id} className="card" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {/* Aspect Ratio Framing Mock Canvas */}
-            <div
-              style={{
-                width: '100%',
-                aspectRatio: shot.aspect_ratio === '2.39:1' ? '21 / 9' : shot.aspect_ratio === '16:9' ? '16 / 9' : '4 / 3',
-                background: 'linear-gradient(135deg, #090d16 0%, #151d2f 50%, #0c1220 100%)',
-                border: '1px solid var(--border)',
-                borderRadius: '6px',
-                position: 'relative',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                overflow: 'hidden',
-                boxShadow: 'inset 0 0 40px rgba(0,0,0,0.8)',
-              }}
-            >
-              {/* Subtle Film Grain / Optics Watermark */}
-              <div style={{ position: 'absolute', top: '10px', left: '10px', display: 'flex', gap: '0.5rem' }}>
-                <span className="badge badge-gold" style={{ fontSize: '0.7rem' }}>
-                  {shot.optics_preset}
-                </span>
-                <span className="badge badge-blue" style={{ fontSize: '0.7rem' }}>
-                  {shot.aspect_ratio}
-                </span>
-              </div>
+        {overview.shots.map((shot) => {
+          const frameUrl = shot.asset_url || shot.image_url || shot.image_uri;
+          return (
+            <div key={shot.shot_id} className="card" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {/* Aspect Ratio Framing Canvas */}
+              <div
+                style={{
+                  width: '100%',
+                  aspectRatio: shot.aspect_ratio === '2.39:1' ? '21 / 9' : shot.aspect_ratio === '16:9' ? '16 / 9' : '4 / 3',
+                  background: '#090d16',
+                  border: '1px solid var(--border)',
+                  borderRadius: '6px',
+                  position: 'relative',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  overflow: 'hidden',
+                  boxShadow: 'inset 0 0 40px rgba(0,0,0,0.8)',
+                }}
+              >
+                {/* Generated Visual Frame Render */}
+                {frameUrl && (
+                  <img
+                    src={frameUrl}
+                    alt={shot.visual_prompt}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                    }}
+                    onError={(e) => {
+                      (e.target as HTMLElement).style.display = 'none';
+                    }}
+                  />
+                )}
 
-              <div style={{ position: 'absolute', top: '10px', right: '10px' }}>
-                <span className="badge badge-purple" style={{ fontSize: '0.7rem' }}>
-                  SEED: {shot.character_seed}
-                </span>
-              </div>
+                {/* Subtle Film Grain / Optics Watermark */}
+                <div style={{ position: 'absolute', top: '10px', left: '10px', display: 'flex', gap: '0.5rem', zIndex: 2 }}>
+                  <span className="badge badge-gold" style={{ fontSize: '0.7rem' }}>
+                    {shot.optics_preset}
+                  </span>
+                  <span className="badge badge-blue" style={{ fontSize: '0.7rem' }}>
+                    {shot.aspect_ratio}
+                  </span>
+                </div>
 
-              {/* Shot Visual Description */}
-              <div style={{ padding: '2rem', textAlign: 'center', maxWidth: '85%' }}>
-                <p style={{ fontSize: '0.9rem', color: '#e2e8f0', fontWeight: 500, fontStyle: 'italic', textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>
-                  "{shot.visual_prompt}"
-                </p>
-              </div>
+                <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 2 }}>
+                  <span className="badge badge-purple" style={{ fontSize: '0.7rem' }}>
+                    SEED: {shot.character_seed}
+                  </span>
+                </div>
+
+                {/* Shot Visual Description (fallback overlay if no image) */}
+                {!frameUrl && (
+                  <div style={{ padding: '2rem', textAlign: 'center', maxWidth: '85%' }}>
+                    <p style={{ fontSize: '0.9rem', color: '#e2e8f0', fontWeight: 500, fontStyle: 'italic', textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>
+                      "{shot.visual_prompt}"
+                    </p>
+                  </div>
+                )}
 
               {/* Dialogue Subtitle if applicable */}
               {shot.dialogue && (
@@ -120,8 +143,9 @@ export const StoryboardTab: React.FC<StoryboardTabProps> = ({ overview }) => {
               </div>
             </div>
           </div>
-        ))}
-      </div>
+        );
+      })}
+    </div>
     </div>
   );
 };

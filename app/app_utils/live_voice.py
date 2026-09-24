@@ -135,8 +135,21 @@ async def handle_table_read_websocket(websocket: WebSocket, session_id: str) -> 
                     )
                     continue
 
-                # Return live rehearsal character dialogue response
-                response_text = f'"{sanitized}" — That\'s what you think. But out here in the neon rain, truth is expensive.'
+                # Dynamically generate character rehearsal response
+                try:
+                    from app.config import DEFAULT_MODEL, create_gemini_model
+                    model = create_gemini_model(DEFAULT_MODEL)
+                    prompt = (
+                        f"You are Kade Mercer, a gritty cyber-detective in Neo-Bangalore 2088. "
+                        f"The film director just gave you this note or line: '{sanitized}'. "
+                        f"Respond in character, concisely (1-2 sentences), adapting to the director's note."
+                    )
+                    res = await model.generate_content_async(prompt)
+                    response_text = res.text.strip().replace('"', '') if res.text else f"Understood, Director: {sanitized}"
+                except Exception as ex:
+                    logger.debug("Gemini dynamic rehearsal fallback: %s", ex)
+                    response_text = f"Understood, Director. Adjusting cadence for '{sanitized}' — the shadows won't wait."
+
                 await websocket.send_json(
                     {
                         "event": "model_turn",

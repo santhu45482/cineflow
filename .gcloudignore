@@ -1,0 +1,51 @@
+.gcloudignore
+.git
+.gitignore
+
+# Virtual environments
+.venv/
+.venv*/
+env/
+venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+node_modules/
+**/node_modules/
+
+# Testing & caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+htmlcov/
+.coverage
+.coverage.*
+
+# Eval & artifacts
+tests/eval/traces/
+tests/eval/results/
+artifacts/
+
+# Credentials & secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+*-key.json
+credentials*.json
+service-account*.json
+.google-agents-cli/
+
+# OS & misc
+.DS_Store
+Thumbs.db
+studio_assets/

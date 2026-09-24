@@ -90,9 +90,60 @@ export const SoundstageTab: React.FC<SoundstageTabProps> = ({ overview, sessionI
     }
   };
 
+  const scoreAudioRef = useRef<HTMLAudioElement | null>(null);
+  const stemAudioRef = useRef<HTMLAudioElement | null>(null);
+  const [activeStem, setActiveStem] = useState<string | null>(null);
+
+  const toggleScorePlayback = () => {
+    if (isPlayingScore) {
+      if (scoreAudioRef.current) {
+        scoreAudioRef.current.pause();
+        scoreAudioRef.current = null;
+      }
+      setIsPlayingScore(false);
+    } else {
+      setIsPlayingScore(true);
+      const scoreAudio = new Audio('/api/media/scores/scene-01-score.wav');
+      scoreAudioRef.current = scoreAudio;
+      scoreAudio.play().catch(() => {});
+      scoreAudio.onended = () => {
+        setIsPlayingScore(false);
+        scoreAudioRef.current = null;
+      };
+    }
+  };
+
+  const handlePlayStem = (shotId: string, stemUrl?: string) => {
+    if (activeStem === shotId) {
+      if (stemAudioRef.current) {
+        stemAudioRef.current.pause();
+        stemAudioRef.current = null;
+      }
+      setActiveStem(null);
+    } else {
+      if (stemAudioRef.current) {
+        stemAudioRef.current.pause();
+      }
+      setActiveStem(shotId);
+      const url = stemUrl || `/api/media/audio/${shotId}.wav`;
+      const audio = new Audio(url);
+      stemAudioRef.current = audio;
+      audio.play().catch(() => {});
+      audio.onended = () => {
+        setActiveStem(null);
+        stemAudioRef.current = null;
+      };
+      setTimeout(() => {
+        setActiveStem((prev) => (prev === shotId ? null : prev));
+      }, 5000);
+    }
+  };
+
   useEffect(() => {
     return () => {
       if (wsRef.current) wsRef.current.close();
+      if (scoreAudioRef.current) scoreAudioRef.current.pause();
+      if (stemAudioRef.current) stemAudioRef.current.pause();
     };
   }, []);
 
@@ -218,7 +269,7 @@ export const SoundstageTab: React.FC<SoundstageTabProps> = ({ overview, sessionI
               <button
                 className="btn btn-outline"
                 style={{ padding: '0.3rem 0.7rem' }}
-                onClick={() => setIsPlayingScore(!isPlayingScore)}
+                onClick={toggleScorePlayback}
               >
                 {isPlayingScore ? <Pause size={14} /> : <Play size={14} />}
                 {isPlayingScore ? 'Pause' : 'Play Cue'}
@@ -246,25 +297,34 @@ export const SoundstageTab: React.FC<SoundstageTabProps> = ({ overview, sessionI
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            <div style={{ background: 'var(--bg-darkest)', padding: '0.75rem', borderRadius: '6px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                <span style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--cyan)' }}>Shot #2: Kade Mercer</span>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>3.8s • 48kHz WAV</span>
-              </div>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
-                "Every memory in this city has a price tag..."
-              </p>
-            </div>
-
-            <div style={{ background: 'var(--bg-darkest)', padding: '0.75rem', borderRadius: '6px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                <span style={{ fontWeight: 600, fontSize: '0.85rem', color: '#a78bfa' }}>Shot #3: Nyx Vane</span>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>5.0s • 48kHz WAV</span>
-              </div>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
-                "You're late, Mercer. The Syndicate already knows which neural shard we pulled."
-              </p>
-            </div>
+            {overview.shots.filter((s) => s.dialogue).map((shot) => {
+              const isPlaying = activeStem === shot.shot_id;
+              return (
+                <div key={shot.shot_id} style={{ background: 'var(--bg-darkest)', padding: '0.75rem', borderRadius: '6px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
+                    <span style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--cyan)' }}>
+                      Shot #{shot.shot_number}: {shot.character_name || 'Character'}
+                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
+                        {shot.duration_seconds}s • 48kHz WAV
+                      </span>
+                      <button
+                        className="btn btn-outline"
+                        style={{ padding: '0.2rem 0.5rem', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+                        onClick={() => handlePlayStem(shot.shot_id, shot.audio_url)}
+                      >
+                        {isPlaying ? <Pause size={12} /> : <Play size={12} />}
+                        <span>{isPlaying ? 'Pause' : 'Play'}</span>
+                      </button>
+                    </div>
+                  </div>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                    "{shot.dialogue}"
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

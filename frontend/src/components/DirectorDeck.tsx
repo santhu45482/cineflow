@@ -164,15 +164,57 @@ export const DirectorDeck: React.FC<DirectorDeckProps> = ({
   useEffect(() => {
     return () => {
       if (wsRef.current) wsRef.current.close();
+      if (audioPlayerRef.current) audioPlayerRef.current.pause();
+      if (scoreAudioRef.current) scoreAudioRef.current.pause();
     };
   }, []);
 
+  const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
+  const scoreAudioRef = useRef<HTMLAudioElement | null>(null);
+
   const handlePlayDialogue = (shotId: string) => {
     if (activePlayingShot === shotId) {
+      if (audioPlayerRef.current) {
+        audioPlayerRef.current.pause();
+        audioPlayerRef.current = null;
+      }
       setActivePlayingShot(null);
     } else {
+      if (audioPlayerRef.current) {
+        audioPlayerRef.current.pause();
+      }
       setActivePlayingShot(shotId);
-      setTimeout(() => setActivePlayingShot(null), 3500);
+      const shot = overview.shots.find((s) => s.shot_id === shotId);
+      const audioUrl = shot?.audio_url || `/api/media/audio/${shotId}.wav`;
+      const audio = new Audio(audioUrl);
+      audioPlayerRef.current = audio;
+      audio.play().catch(() => {});
+      audio.onended = () => {
+        setActivePlayingShot(null);
+        audioPlayerRef.current = null;
+      };
+      setTimeout(() => {
+        setActivePlayingShot((prev) => (prev === shotId ? null : prev));
+      }, 5000);
+    }
+  };
+
+  const toggleScorePlayback = () => {
+    if (isPlayingScore) {
+      if (scoreAudioRef.current) {
+        scoreAudioRef.current.pause();
+        scoreAudioRef.current = null;
+      }
+      setIsPlayingScore(false);
+    } else {
+      setIsPlayingScore(true);
+      const scoreAudio = new Audio('/api/media/scores/scene-01-score.wav');
+      scoreAudioRef.current = scoreAudio;
+      scoreAudio.play().catch(() => {});
+      scoreAudio.onended = () => {
+        setIsPlayingScore(false);
+        scoreAudioRef.current = null;
+      };
     }
   };
 
@@ -459,7 +501,7 @@ Then we have four minutes before the perimeter collapses.`}
               <button
                 className="btn btn-outline"
                 style={{ padding: '0.35rem 0.65rem', borderRadius: '50%' }}
-                onClick={() => setIsPlayingScore(!isPlayingScore)}
+                onClick={toggleScorePlayback}
                 title="Play/Pause Score"
               >
                 {isPlayingScore ? <Pause size={14} color="#f59e0b" /> : <Play size={14} color="#f59e0b" />}
@@ -483,6 +525,7 @@ Then we have four minutes before the perimeter collapses.`}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1rem' }}>
             {overview.shots.map((shot: ShotUnit) => {
               const isPlaying = activePlayingShot === shot.shot_id;
+              const frameUrl = shot.asset_url || shot.image_url || shot.image_uri;
               return (
                 <div
                   key={shot.shot_id}
@@ -501,7 +544,7 @@ Then we have four minutes before the perimeter collapses.`}
                     style={{
                       width: '100%',
                       aspectRatio: shot.aspect_ratio === '2.39:1' ? '21 / 9' : '16 / 9',
-                      background: 'linear-gradient(135deg, #090d16 0%, #151d2f 50%, #0c1220 100%)',
+                      background: '#090d16',
                       border: '1px solid var(--border)',
                       borderRadius: '6px',
                       position: 'relative',
@@ -512,8 +555,27 @@ Then we have four minutes before the perimeter collapses.`}
                       boxShadow: 'inset 0 0 30px rgba(0,0,0,0.85)',
                     }}
                   >
+                    {/* Rendered Visual Frame */}
+                    {frameUrl && (
+                      <img
+                        src={frameUrl}
+                        alt={shot.visual_prompt}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                        }}
+                        onError={(e) => {
+                          (e.target as HTMLElement).style.display = 'none';
+                        }}
+                      />
+                    )}
+
                     {/* Top Chips */}
-                    <div style={{ position: 'absolute', top: '8px', left: '8px', display: 'flex', gap: '0.4rem' }}>
+                    <div style={{ position: 'absolute', top: '8px', left: '8px', display: 'flex', gap: '0.4rem', zIndex: 2 }}>
                       <span className="badge badge-gold" style={{ fontSize: '0.65rem', padding: '0.15rem 0.4rem' }}>
                         {shot.optics_preset.split(' ')[0]}
                       </span>
@@ -522,26 +584,28 @@ Then we have four minutes before the perimeter collapses.`}
                       </span>
                     </div>
 
-                    <div style={{ position: 'absolute', top: '8px', right: '8px' }}>
+                    <div style={{ position: 'absolute', top: '8px', right: '8px', zIndex: 2 }}>
                       <span className="badge badge-purple" style={{ fontSize: '0.65rem', padding: '0.15rem 0.4rem' }}>
                         SEED: {shot.character_seed}
                       </span>
                     </div>
 
-                    {/* Prompt Preview */}
-                    <div style={{ padding: '1rem 1.25rem', textAlign: 'center', maxWidth: '90%' }}>
-                      <p
-                        style={{
-                          fontSize: '0.8rem',
-                          color: '#e2e8f0',
-                          fontStyle: 'italic',
-                          lineHeight: '1.35',
-                          textShadow: '0 2px 4px rgba(0,0,0,0.9)',
-                        }}
-                      >
-                        "{shot.visual_prompt}"
-                      </p>
-                    </div>
+                    {/* Prompt Preview (fallback overlay if no image) */}
+                    {!frameUrl && (
+                      <div style={{ padding: '1rem 1.25rem', textAlign: 'center', maxWidth: '90%' }}>
+                        <p
+                          style={{
+                            fontSize: '0.8rem',
+                            color: '#e2e8f0',
+                            fontStyle: 'italic',
+                            lineHeight: '1.35',
+                            textShadow: '0 2px 4px rgba(0,0,0,0.9)',
+                          }}
+                        >
+                          "{shot.visual_prompt}"
+                        </p>
+                      </div>
+                    )}
 
                     {/* Subtitle Pill if dialogue present */}
                     {shot.dialogue && (

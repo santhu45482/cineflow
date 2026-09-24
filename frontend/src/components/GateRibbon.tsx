@@ -39,16 +39,17 @@ export const GateRibbon: React.FC<GateRibbonProps> = ({
     setSubmitting(true);
     setActionMessage(`Submitting Director Gate decision (${status})...`);
     try {
+      const currentInterruptId = activeGate === 'GATE_2_ASSETS' ? 'gate_2_approval' : 'gate_1_approval';
       const res = await resumeProductionGate({
-        session_id: sessionId,
-        interrupt_id: 'gate-001',
+        session_id: sessionId || 'director-session-default',
+        interrupt_id: currentInterruptId,
         approval_status: status,
         director_notes: directorNotes,
       });
       setActionMessage(res.message || `Gate ${status.toLowerCase()} successfully.`);
       setOverview((prev) => ({
         ...prev,
-        active_gate: res.active_gate || (status === 'APPROVED' ? 'GATE_2_ASSETS' : 'GATE_1_PREPROD'),
+        active_gate: res.active_gate || (status === 'APPROVED' ? (activeGate === 'GATE_1_PREPROD' ? 'GATE_2_ASSETS' : 'GATE_3_FINAL') : activeGate),
       }));
       setDirectorNotes('');
     } catch (err) {

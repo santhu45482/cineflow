@@ -312,21 +312,27 @@ def trigger_automated_recovery(
     }
 
 
-def run_sre_diagnostics_suite(scenario: str = "full_pipeline_audit") -> dict[str, Any]:
+def run_sre_diagnostics_suite(
+    scenario: str = "full_pipeline_audit",
+    incident_id: str | None = None,
+    **kwargs: Any,
+) -> dict[str, Any]:
     """Executes an autonomous SRE telemetry triage and self-healing loop using Google Cloud Operations Suite.
 
     Args:
         scenario: Diagnostic scenario (e.g., 'full_pipeline_audit', 'render_failure_triage', 'latency_spike').
+        incident_id: Optional incident reference identifier (e.g., 'INC-8891').
 
     Returns:
         Dict with Cloud Logging entries, Cloud Trace spans, Cloud Monitoring error rates, and automated remediation action.
     """
     project_id = os.getenv("GOOGLE_CLOUD_PROJECT", "cineflow-10")
+    effective_incident_id = incident_id or "INC-GCP-2026-09"
     logs_res = query_cloud_logs('resource.type="cloud_run_revision" severity>=ERROR', limit=3)
     trace_res = query_cloud_traces(service_name="cineflow.ffmpeg_worker")
     monitoring_res = query_cloud_monitoring_metrics("sum(rate(cineflow_errors_total[5m])) by (service)")
     recovery_res = trigger_automated_recovery(
-        incident_id="INC-GCP-2026-09",
+        incident_id=effective_incident_id,
         corrective_action="reprovision_ffmpeg_worker_pool_and_increase_stem_buffer",
         component="ffmpeg_worker_pool",
         incident_type="RENDER_TIMEOUT",
@@ -376,4 +382,41 @@ def query_mimir_metrics(
     return query_cloud_monitoring_metrics(
         metric_name=metric_name, minutes_ago=minutes_ago
     )
+
+
+def run_diagnostics(scenario: str = "full_pipeline_audit", **kwargs: Any) -> dict[str, Any]:
+    """Runs SRE diagnostics across studio rendering and pipeline services."""
+    return run_sre_diagnostics_suite(scenario=scenario)
+
+
+def check_distributed_traces(
+    service_name: str = "cineflow",
+    trace_id: str | None = None,
+    filter_criteria: str | None = None,
+    **kwargs: Any,
+) -> dict[str, Any]:
+    """Inspects distributed traces across services for latency spikes and bottlenecks."""
+    return query_cloud_traces(trace_id=trace_id, service_name=service_name)
+
+
+def get_system_logs(
+    filter_or_query: str = 'resource.type="cloud_run_revision" severity>=WARNING',
+    limit: int = 10,
+    incident_id: str | None = None,
+    **kwargs: Any,
+) -> dict[str, Any]:
+    """Retrieves Google Cloud system logs for an incident or service."""
+    return query_cloud_logs(filter_or_query=filter_or_query, limit=limit, **kwargs)
+
+
+def get_distributed_traces(
+    service_name: str = "cineflow",
+    trace_id: str | None = None,
+    incident_id: str | None = None,
+    **kwargs: Any,
+) -> dict[str, Any]:
+    """Retrieves distributed OpenTelemetry traces across studio microservices."""
+    return query_cloud_traces(service_name=service_name, trace_id=trace_id)
+
+
 

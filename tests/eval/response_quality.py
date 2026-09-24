@@ -68,6 +68,7 @@ def evaluate(instance):
         ),
     )
     verdict = response.parsed
-    if verdict is None:  # model returned nothing usable
-        return {"score": 0, "explanation": response.text or ""}
-    return {"score": max(1, min(5, verdict.score)), "explanation": verdict.explanation}
+    if verdict is None:
+        return {"score": 0.0, "explanation": response.text or ""}
+    normalized_score = round(max(1, min(5, verdict.score)) / 5.0, 4)
+    return {"score": normalized_score, "explanation": verdict.explanation}

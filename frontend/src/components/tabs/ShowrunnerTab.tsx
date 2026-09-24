@@ -46,9 +46,10 @@ export const ShowrunnerTab: React.FC<ShowrunnerTabProps> = ({
   const handleGateAction = async (status: 'APPROVED' | 'REJECTED') => {
     setStatusMessage(`Submitting Director Gate decision (${status})...`);
     try {
+      const currentInterruptId = overview.active_gate === 'GATE_2_ASSETS' ? 'gate_2_approval' : 'gate_1_approval';
       const res = await resumeProductionGate({
-        session_id: sessionId,
-        interrupt_id: 'gate-001',
+        session_id: sessionId || 'director-session-default',
+        interrupt_id: currentInterruptId,
         approval_status: status,
         director_notes: directorNotes,
       });
