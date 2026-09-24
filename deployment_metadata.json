@@ -1,12 +1,8 @@
 {
-  "service_name": "cineflow-studio",
-  "service_url": "https://cineflow-studio-862199224023.us-east1.run.app",
-  "project_id": "cineflow-10",
-  "region": "us-east1",
-  "deployment_target": "cloud_run",
+  "remote_agent_runtime_id": "projects/862199224023/locations/us-east1/reasoningEngines/1493066421775630336",
+  "deployment_target": "agent_runtime",
   "is_a2a": true,
   "language": "python",
   "agent_directory": "app",
-  "deployment_timestamp": "2026-09-21T08:24:43+00:00",
-  "remote_agent_runtime_id": "projects/862199224023/locations/us-east1/reasoningEngines/1493066421775630336"
+  "deployment_timestamp": "2026-09-24T08:56:00.780977+00:00"
 }
